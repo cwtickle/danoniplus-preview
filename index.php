@@ -245,6 +245,256 @@ function compareSemanticVersions($versionA, $versionB) {
         background: #66666699;
     }
     </style>
+<?php
+
+// ▼ アップロード結果を格納する配列
+$uploaded = [
+    'music' => '',
+    'js'    => [],
+    'css'   => [],
+    'dos'   => '',
+    'html'  => '',
+    'img'   => [],
+];
+
+// ▼ プリロードJS
+$uploadedPreJs = [];
+
+// ▼ ランダムタイムスタンプ
+if (isset($_POST['time']) && $_POST['time'] !== '') {
+    $randTime = $_POST['time'];
+} else {
+    $randTime = date('YmdHis');
+}
+
+/*-----------------------------------
+ * 音源ファイル
+ *-----------------------------------*/
+if (!empty($_FILES['musicFile']['tmp_name']) && $_FILES['musicFile']['error'] === UPLOAD_ERR_OK) {
+    $filename = escapeStrMusic(basename($_FILES['musicFile']['name']));
+    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+    if (in_array($ext, ['mp3','mp4','m4a','ogg','oga','aac','flac','js'])) {
+        $savedName = $randTime . '_' . $filename;
+        $uploadPath = $rootDir . '/tmp/' . $savedName;
+
+        if (move_uploaded_file($_FILES['musicFile']['tmp_name'], $uploadPath)) {
+            $uploaded['music'] = $savedName; // serverData 用
+            $_POST['mf'] = $filename;        // HTML 表示用
+        }
+    }
+}
+
+/*-----------------------------------
+ * 譜面ファイル（dosFile1）
+ *-----------------------------------*/
+if (!empty($_FILES['dosFile1']['tmp_name']) && $_FILES['dosFile1']['error'] === UPLOAD_ERR_OK) {
+    $filename = basename($_FILES['dosFile1']['name']);
+    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+    if (in_array($ext, ['js','txt'])) {
+        $savedName = $randTime . '_' . $filename;
+        $uploadPath = $rootDir . '/tmp/' . $savedName;
+
+        if (move_uploaded_file($_FILES['dosFile1']['tmp_name'], $uploadPath)) {
+            $uploaded['dos'] = $savedName;
+            $_POST['dosf1'] = $filename;
+        }
+    }
+}
+
+/*-----------------------------------
+ * HTMLテンプレート
+ *-----------------------------------*/
+if (!empty($_FILES['htmlFile']['tmp_name']) && $_FILES['htmlFile']['error'] === UPLOAD_ERR_OK) {
+    $filename = basename($_FILES['htmlFile']['name']);
+    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+    if (in_array($ext, ['html','htm'])) {
+        $savedName = $randTime . '_' . $filename;
+        $uploadPath = $rootDir . '/tmp/' . $savedName;
+
+        if (move_uploaded_file($_FILES['htmlFile']['tmp_name'], $uploadPath)) {
+            $uploaded['html'] = $savedName;
+            $_POST['htmlf1'] = $filename;
+        }
+    }
+}
+
+/*-----------------------------------
+ * カスタムJS（3つ）
+ *-----------------------------------*/
+for ($i = 1; $i <= 3; $i++) {
+    if (!empty($_FILES['jsFile'.$i]['tmp_name']) && $_FILES['jsFile'.$i]['error'] === UPLOAD_ERR_OK) {
+        $filename = basename($_FILES['jsFile'.$i]['name']);
+        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+        if ($ext === 'js') {
+            $savedName = $randTime . '_' . $filename;
+            $uploadPath = $rootDir . '/tmp/' . $savedName;
+
+            if (move_uploaded_file($_FILES['jsFile'.$i]['tmp_name'], $uploadPath)) {
+                $uploaded['js'][] = $savedName;
+                $_POST['jf'.$i] = $filename;
+            }
+        }
+    }
+}
+
+/*-----------------------------------
+ * カスタムCSS（2つ）
+ *-----------------------------------*/
+for ($i = 1; $i <= 2; $i++) {
+    if (!empty($_FILES['cssFile'.$i]['tmp_name']) && $_FILES['cssFile'.$i]['error'] === UPLOAD_ERR_OK) {
+        $filename = basename($_FILES['cssFile'.$i]['name']);
+        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+        if ($ext === 'css') {
+            $savedName = $randTime . '_' . $filename;
+            $uploadPath = $rootDir . '/tmp/' . $savedName;
+
+            if (move_uploaded_file($_FILES['cssFile'.$i]['tmp_name'], $uploadPath)) {
+                $uploaded['css'][] = $savedName;
+                $_POST['cf'.$i] = $filename;
+            }
+        }
+    }
+}
+
+/*-----------------------------------
+ * 画像ファイル（複数）
+ *-----------------------------------*/
+if (!empty($_FILES['imgFiles']['name'][0])) {
+    $imgList = [];
+
+    foreach ($_FILES['imgFiles']['name'] as $idx => $name) {
+        if ($_FILES['imgFiles']['error'][$idx] === UPLOAD_ERR_OK) {
+            $filename = basename($name);
+            $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+            if (in_array($ext, ['png','jpg','jpeg','gif','svg','webp'])) {
+                $savedName = $randTime . '_' . $filename;
+                $uploadPath = $rootDir . '/tmp/' . $savedName;
+
+                if (move_uploaded_file($_FILES['imgFiles']['tmp_name'][$idx], $uploadPath)) {
+                    $uploaded['img'][] = $savedName;
+                    $imgList[] = $filename; // 表示用
+                }
+            }
+        }
+    }
+
+    $_POST['imgs'] = implode(',', $imgList);
+}
+
+/*-----------------------------------
+ * プリロードJS（複数）
+ *-----------------------------------*/
+if (!empty($_FILES['prejsFiles']['name'][0])) {
+    $preList = [];
+
+    foreach ($_FILES['prejsFiles']['name'] as $idx => $name) {
+        if ($_FILES['prejsFiles']['error'][$idx] === UPLOAD_ERR_OK) {
+            $filename = basename($name);
+            $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+            if ($ext === 'js') {
+                $savedName = $randTime . '_' . $filename;
+                $uploadPath = $rootDir . '/tmp/' . $savedName;
+
+                if (move_uploaded_file($_FILES['prejsFiles']['tmp_name'][$idx], $uploadPath)) {
+                    $uploadedPreJs[] = $savedName;
+                    $preList[] = $filename; // 表示用
+                }
+            }
+        }
+    }
+
+    $_POST['prejs'] = implode(',', $preList);
+}
+
+?>
+<script>
+const serverData = <?php echo json_encode([
+
+    // -----------------------------
+    // 1. POST で送られてくる値
+    // -----------------------------
+    'post' => [
+        'd'        => $_POST['d']        ?? '',
+        'k'        => $_POST['k']        ?? '',
+        'mf'       => $_POST['mf']       ?? '',
+        'jf'       => $_POST['jf']       ?? '',
+        'jf1'      => $_POST['jf1']      ?? '',
+        'jf2'      => $_POST['jf2']      ?? '',
+        'jf3'      => $_POST['jf3']      ?? '',
+        'cf'       => $_POST['cf']       ?? '',
+        'cf1'      => $_POST['cf1']      ?? '',
+        'cf2'      => $_POST['cf2']      ?? '',
+        'imgs'     => $_POST['imgs']     ?? '',
+        'imgf'     => $_POST['imgf']     ?? '',
+        'dosf'     => $_POST['dosf']     ?? '',
+        'dosf1'    => $_POST['dosf1']    ?? '',
+        'htmlf'    => $_POST['htmlf']    ?? '',
+        'htmlf1'   => $_POST['htmlf1']   ?? '',
+        'dosM'     => $_POST['dosM']     ?? 'UTF-8',
+        'prevals'  => $_POST['prevals']  ?? '',
+        'prejs'    => $_POST['prejs']    ?? '',
+        'prejf'    => $_POST['prejf']    ?? '',
+        'queryParams' => $_POST['queryParams'] ?? '',
+        'cjd'      => $_POST['cjd']      ?? '',
+        'g'        => $_POST['g']        ?? '',
+        'h'        => $_POST['h']        ?? '500px',
+        'time'     => $_POST['time']     ?? '',
+    ],
+
+    // -----------------------------
+    // 2. バージョン情報
+    // -----------------------------
+    'version' => [
+        'selected' => $_POST['v'] ?? '',
+        'param'    => $getParamPath ?? '',
+        'latest'   => $latestVerPath ?? '',
+        'type'     => 'local',   // index.php はローカル版
+    ],
+
+    // -----------------------------
+    // 3. サーバー環境情報
+    // -----------------------------
+    'env' => [
+        'rootDir' => $rootDir,
+        'rootUrl' => $rootUrl,
+        'host'    => $_SERVER['HTTP_HOST'],
+        'urlDomain' => (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'],
+    ],
+
+    // -----------------------------
+    // 4. PHP 内部で生成される値
+    // -----------------------------
+    'internal' => [
+        'escaped_d'       => escapeStr($_POST['d'] ?? ''),
+        'escaped_k'       => escapeStr($_POST['k'] ?? ''),
+        'escaped_prevals' => escapeStr($_POST['prevals'] ?? ''),
+        'escaped_query'   => escapeStr($_POST['queryParams'] ?? ''),
+    ],
+
+    // -----------------------------
+    // 5. アップロード結果（タイムスタンプ付き）
+    // -----------------------------
+    'upload' => [
+        'time'  => $randTime,
+        'music' => $uploaded['music'],
+        'js'    => $uploaded['js'],
+        'css'   => $uploaded['css'],
+        'dos'   => $uploaded['dos'],
+        'html'  => $uploaded['html'],
+        'img'   => $uploaded['img'],
+        'prejs' => $uploadedPreJs,
+    ],
+
+]);
+?>;
+</script>
 </head>
 
 <body>
@@ -549,229 +799,94 @@ function compareSemanticVersions($versionA, $versionB) {
                     return 0; // versionA and versionB are equal
                 };
 
+                for (const [key, value] of Object.entries(serverData.post)) {
+                    const el = document.getElementById(key);
+                    if (el) el.value = value;
+                }
+
                 // 譜面データ及び追加設定の初期化
                 const url = new URL(window.location.href);
                 const params = url.searchParams;
                 const urlDomain = url.origin;
-                const dosData = `<?php echo escapeStr(isset($_POST["d"]) ? $_POST["d"] : ''); ?>`;
                 const musicData_g = `|musicTitle=musicTitle,artistName,${urlDomain}|musicUrl=nosound.mp3|`;
-                let difData_g = `<?php echo escapeStr(isset($_POST["k"]) ? $_POST["k"] : ''); ?>`;
-                const version_g = `<?php echo isset($_POST["v"]) ? $_POST["v"] : ''; ?>` || `<?php echo $getParamPath ?>` ||
-                    `<?php echo $latestVerPath; ?>` || document.getElementById('v').options[0].value;
 
-                document.getElementById('mf').value = `<?php echo isset($_POST["mf"]) ? $_POST["mf"] : ''; ?>`;
-                document.getElementById('jf').value = `<?php echo isset($_POST["jf"]) ? $_POST["jf"] : ''; ?>`;
-                document.getElementById('cf').value = `<?php echo isset($_POST["cf"]) ? $_POST["cf"] : ''; ?>`;
-                document.getElementById('jf1').value = `<?php echo isset($_POST["jf1"]) ? $_POST["jf1"] : ''; ?>`;
-                document.getElementById('jf2').value = `<?php echo isset($_POST["jf2"]) ? $_POST["jf2"] : ''; ?>`;
-                document.getElementById('jf3').value = `<?php echo isset($_POST["jf3"]) ? $_POST["jf3"] : ''; ?>`;
-                document.getElementById('imgs').value = `<?php echo isset($_POST["imgs"]) ? $_POST["imgs"] : ''; ?>`;
-                document.getElementById('imgf').value = `<?php echo isset($_POST["imgf"]) ? $_POST["imgf"] : ''; ?>`;
-                document.getElementById('dosf').value = `<?php echo isset($_POST["dosf"]) ? $_POST["dosf"] : ''; ?>`;
-                document.getElementById('dosf1').value = `<?php echo isset($_POST["dosf1"]) ? $_POST["dosf1"] : ''; ?>`;
-                document.getElementById('htmlf').value = `<?php echo isset($_POST["htmlf"]) ? $_POST["htmlf"] : ''; ?>`;
-                document.getElementById('htmlf1').value = `<?php echo isset($_POST["htmlf1"]) ? $_POST["htmlf1"] : ''; ?>`;
-                document.getElementById('dosM').value = `<?php echo isset($_POST["dosM"]) ? $_POST["dosM"] : ''; ?>` || `UTF-8`;
-                document.getElementById('cf1').value = `<?php echo isset($_POST["cf1"]) ? $_POST["cf1"] : ''; ?>`;
-                document.getElementById('cf2').value = `<?php echo isset($_POST["cf2"]) ? $_POST["cf2"] : ''; ?>`;
-                document.getElementById('prevals').value = `<?php echo escapeStr(isset($_POST["prevals"]) ? $_POST["prevals"] : ''); ?>`;
-                document.getElementById('queryParams').value = `<?php echo escapeStr(isset($_POST["queryParams"]) ? $_POST["queryParams"] : ''); ?>`;
-                document.getElementById('prejs').value = `<?php echo isset($_POST["prejs"]) ? $_POST["prejs"] : ''; ?>`;
-                document.getElementById('prejf').value = `<?php echo isset($_POST["prejf"]) ? $_POST["prejf"] : ''; ?>`;
+                const dosData = serverData.internal.escaped_d;
+                let difData_g = serverData.internal.escaped_k;
 
-                document.getElementById('time').value = `<?php echo isset($_POST["time"]) ? $_POST["time"] : ''; ?>`;
-                document.getElementById('cjd').value = `<?php echo isset($_POST["cjd"]) ? $_POST["cjd"] : ''; ?>`;
-                document.getElementById('g').value = `<?php echo isset($_POST["g"]) ? $_POST["g"] : ''; ?>`;
+                const version_g =
+                    serverData.version.selected ||
+                    serverData.version.param ||
+                    serverData.version.latest ||
+                    document.getElementById('v').options[0].value;
+
                 document.getElementById('d').value = dosData;
                 document.getElementById('dos').value = dosData;
 
-                document.getElementById('h').value = `<?php echo isset($_POST["h"]) ? $_POST["h"] : ''; ?>` || `500px`;
+                // ▼ 楽曲ファイル
+                if (serverData.upload.music) {
+                    // 表示用は元ファイル名（タイムスタンプなし）
+                    document.getElementById('mf').value = serverData.post.mf || '';
 
-                <?php
-					$randTime = isset($_POST["time"]) ? $_POST["time"] : '';
-					if ($randTime == '') {
-						$randTime = date('YmdHis');
-					}
-					echo "document.getElementById('time').value = `".$randTime."`;";
-					
-					// 音源ファイルの読込と設定
-					// POSTされたデータの中に音源ファイル名が含まれている場合は、その情報を使う
-					$tempfile = isset($_FILES['musicFile']['tmp_name']) ? $_FILES['musicFile']['tmp_name'] : '';
-					$filename = escapeStrMusic(basename(isset($_FILES['musicFile']['name']) ? $_FILES['musicFile']['name'] : ''));
-					$uploadFile = $rootDir.'/tmp/'.$randTime.'_'.$filename;
-					if (is_uploaded_file($tempfile) && isset($_FILES['musicFile']['error']) && $_FILES['musicFile']['error'] == UPLOAD_ERR_OK) {
-						$ext = pathinfo($filename, PATHINFO_EXTENSION);
-						if (in_array($ext, array('mp3', 'ogg', 'oga', 'mp4', 'm4a', 'aac', 'flac', 'js'))) {
-							if ( move_uploaded_file($tempfile , $uploadFile )) {
-								echo "document.getElementById('dos').value += `|musicUrl=(..)/tmp/".$randTime.'_'.$filename."|`;";
-								echo "document.getElementById('mf').value = `".$filename."`;\n";
-							}
-						}
-					}
+                    // 読み込み用はタイムスタンプ付きファイル名
+                    document.getElementById('dos').value +=
+                        `|musicUrl=(..)/tmp/${serverData.upload.music}|`;
+                }
 
-					// カスタムJSファイルの読込と設定
-					// POSTされたデータの中にカスタムJSファイル名が含まれている場合は、その情報を使う
-					$jsFlg = 0;
-					$customJsList = "";
-					for ($i = 1; $i <= 3; $i++) {
-						$tempJsFile = isset($_FILES['jsFile'.$i]['tmp_name']) ? $_FILES['jsFile'.$i]['tmp_name'] : '';
-						$fileJsName = basename(isset($_FILES['jsFile'.$i]['name']) ? $_FILES['jsFile'.$i]['name'] : '');
-						$uploadJsFile = $rootDir.'/tmp/'.$randTime.'_'.$fileJsName;
-						
-						if (is_uploaded_file($tempJsFile) && isset($_FILES['jsFile'.$i]['error']) && $_FILES['jsFile'.$i]['error'] == UPLOAD_ERR_OK) {
-							$ext = pathinfo($fileJsName, PATHINFO_EXTENSION);
-						    if (in_array($ext, array('js'))) {
-								if ( move_uploaded_file($tempJsFile , $uploadJsFile )) {
-									if ($customJsList != '') {
-										$customJsList = $customJsList.",";
-									}
-									$customJsList = $customJsList.'(..)/tmp/'.$randTime.'_'.$fileJsName;
-									echo "document.getElementById('jf".$i."').value = `".$fileJsName."`;";
-									$jsFlg = 1;
-								}
-							}
-						} else if (isset($_POST["jf".$i]) && $_POST["jf".$i] != '') {
-							$customJsList = $customJsList.'(..)/tmp/'.$randTime.'_'.$_POST["jf".$i];
-							$jsFlg = 1;
-						}
-					}
-					if ($jsFlg == 1) {
-						echo "document.getElementById('dos').value += `|customJs=".$customJsList."|`;";
-						echo "document.getElementById('jf').value = `".$customJsList."`;\n";
-					}
-					
-					// カスタムCSSファイルの読込と設定
-					// POSTされたデータの中にカスタムCSSファイル名が含まれている場合は、その情報を使う
-					$cssFlg = 0;
-					$customCssList = "";
-					for ($i = 1; $i <= 2; $i++) {
-						$tempCssFile = isset($_FILES['cssFile'.$i]['tmp_name']) ? $_FILES['cssFile'.$i]['tmp_name'] : '';
-						$fileCssName = basename(isset($_FILES['cssFile'.$i]['name']) ? $_FILES['cssFile'.$i]['name'] : '');
-						$uploadCssFile = $rootDir.'/tmp/'.$randTime.'_'.$fileCssName;
-						
-						if (is_uploaded_file($tempCssFile) && isset($_FILES['cssFile'.$i]['error']) && $_FILES['cssFile'.$i]['error'] == UPLOAD_ERR_OK) {
-							$ext = pathinfo($fileCssName, PATHINFO_EXTENSION);
-						    if (in_array($ext, array('css'))) {
-								if ( move_uploaded_file($tempCssFile , $uploadCssFile )) {
-									if ($customCssList != '') {
-										$customCssList = $customCssList.",";
-									}
-									$customCssList = $customCssList.'(..)/tmp/'.$randTime.'_'.$fileCssName;
-									echo "document.getElementById('cf".$i."').value = `".$fileCssName."`;";
-									$cssFlg = 1;
-								}
-							}
-						} else if (isset($_POST["cf".$i]) && $_POST["cf".$i] != '') {
-							$customJsList = $customJsList.'(..)/tmp/'.$randTime.'_'.$_POST["cf".$i];
-							$cssFlg = 1;
-						}
-					}
-					if ($cssFlg == 1) {
-						echo "document.getElementById('dos').value += `|customCss=".$customCssList."|`;";
-						echo "document.getElementById('cf').value = `".$customCssList."`;\n";
-					}
+                // ▼ 譜面ファイル
+                if (serverData.upload.dos) {
+                    // 表示用（タイムスタンプなし）
+                    document.getElementById('dosf1').value = serverData.post.dosf1 || '';
+                    // 読み込み用（タイムスタンプ付き）
+                    document.getElementById('dosf').value = serverData.upload.dos;
+                }
 
-					// 譜面ファイルの読込と設定
-					// POSTされたデータの中に譜面ファイル名が含まれている場合は、その情報を使う
-					$dosFlg = 0;
-					$tempDosFile = isset($_FILES['dosFile1']['tmp_name']) ? $_FILES['dosFile1']['tmp_name'] : '';
-					$fileDosName = basename(isset($_FILES['dosFile1']['name']) ? $_FILES['dosFile1']['name'] : '');
-					$uploadDosFile = $rootDir.'/tmp/'.$randTime.'_'.$fileDosName;
-					$dosOrgName = './tmp/'.$randTime.'_'.$fileDosName;
-					
-					if (is_uploaded_file($tempDosFile) && isset($_FILES['dosFile1']['error']) && $_FILES['dosFile1']['error'] == UPLOAD_ERR_OK) {
-                        $ext = pathinfo($fileDosName, PATHINFO_EXTENSION);
-						if (in_array($ext, array('js', 'txt'))) {
-							if ( move_uploaded_file($tempDosFile , $uploadDosFile )) {
-								echo "document.getElementById('dosf').value = `".$dosOrgName."`;";
-								echo "document.getElementById('dosf1').value = `".$fileDosName."`;\n";
-								$dosFlg = 1;
-							}
-						}
-					}
+                // ▼ HTMLテンプレート
+                if (serverData.upload.html) {
+                    document.getElementById('htmlf1').value = serverData.post.htmlf1 || '';
+                    document.getElementById('htmlf').value  = serverData.upload.html;
+                }
 
-					// 画像ファイル群の読込と設定
-					// アップロードファイルが存在しない場合は、すでにアップロードされているファイル群を使う
-					$imgFlg = 0;
-					$imgList = "";
-					$imgOrgList = "";
-					$imgCount = isset($_FILES['imgFiles']['name']) ? count($_FILES['imgFiles']['name']) : 0;
-					for ($i = 0; $i < $imgCount; $i++) {
-						$tempImgFile = isset($_FILES['imgFiles']['tmp_name'][$i]) ? $_FILES['imgFiles']['tmp_name'][$i] : '';
-						$fileImgName = basename(isset($_FILES['imgFiles']['name'][$i]) ? $_FILES['imgFiles']['name'][$i] : '');
-						$uploadImgFile = $rootDir.'/tmp/'.$randTime.'_'.$fileImgName;
-						
-						if (is_uploaded_file($tempImgFile) && isset($_FILES['imgFiles']['error'][$i]) && $_FILES['imgFiles']['error'][$i] == UPLOAD_ERR_OK) {
-							$ext = pathinfo($fileImgName, PATHINFO_EXTENSION);
-							if (in_array($ext, array('png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'))) {
-								if ( move_uploaded_file($tempImgFile , $uploadImgFile )) {
-									if ($imgList != '') {
-										$imgList = $imgList.",";
-										$imgOrgList = $imgOrgList.",";
-									}
-									$imgList = $imgList.'./tmp/'.$randTime.'_'.$fileImgName;
-									$imgOrgList = $imgOrgList.$fileImgName;
-									$imgFlg = 1;
-								}
-							}
-						}
-					}
-					if ($imgFlg == 1) {
-						echo "document.getElementById('imgs').value = `".$imgOrgList."`;";
-						echo "document.getElementById('imgf').value = `".$imgList."`;\n";
-					}
+                // ▼ カスタムJS
+                if (serverData.upload.js.length > 0) {
+                    // 表示用（タイムスタンプなし）
+                    document.getElementById('jf1').value = serverData.post.jf1 || '';
+                    document.getElementById('jf2').value = serverData.post.jf2 || '';
+                    document.getElementById('jf3').value = serverData.post.jf3 || '';
 
-					// HTMLテンプレートの読込と設定
-					// POSTされたデータの中にHTMLテンプレートファイル名が含まれている場合は、その情報を使う
-					$htmlFlg = 0;
-					$tempHtmlFile = isset($_FILES['htmlFile']['tmp_name']) ? $_FILES['htmlFile']['tmp_name'] : '';
-					$fileHtmlName = basename(isset($_FILES['htmlFile']['name']) ? $_FILES['htmlFile']['name'] : '');
-					$uploadHtmlFile = $rootDir.'/tmp/'.$randTime.'_'.$fileHtmlName;
-					$htmlOrgName = './tmp/'.$randTime.'_'.$fileHtmlName;
-					
-					if (is_uploaded_file($tempHtmlFile) && isset($_FILES['htmlFile']['error']) && $_FILES['htmlFile']['error'] == UPLOAD_ERR_OK) {
-						$ext = pathinfo($fileHtmlName, PATHINFO_EXTENSION);
-                        if (in_array($ext, array('html', 'htm'))) {
-							if ( move_uploaded_file($tempHtmlFile , $uploadHtmlFile )) {
-								echo "document.getElementById('htmlf').value = `".$htmlOrgName."`;";
-								echo "document.getElementById('htmlf1').value = `".$fileHtmlName."`;\n";
-								$htmlFlg = 1;
-							}
-						}
-					}
+                    // 読み込み用（タイムスタンプ付き）
+                    const jsList = serverData.upload.js.map(f => `(..)/tmp/${f}`).join(',');
+                    document.getElementById('jf').value = jsList;
+                    document.getElementById('dos').value += `|customJs=${jsList}|`;
+                }
 
-					// プリロードするjsファイル群の読込と設定
-					// アップロードファイルが存在しない場合は、すでにアップロードされているファイル群を使う
-					$prejsFlg = 0;
-					$prejsList = "";
-					$prejsOrgList = "";
-					$prejsCount = isset($_FILES['prejsFiles']['name']) ? count($_FILES['prejsFiles']['name']) : 0;
-					for ($i = 0; $i < $prejsCount; $i++) {
-						$tempPrejsFile = isset($_FILES['prejsFiles']['tmp_name'][$i]) ? $_FILES['prejsFiles']['tmp_name'][$i] : '';
-						$filePrejsName = basename(isset($_FILES['prejsFiles']['name'][$i]) ? $_FILES['prejsFiles']['name'][$i] : '');
-						$uploadPrejsFile = $rootDir.'/tmp/'.$randTime.'_'.$filePrejsName;
-						
-						if (is_uploaded_file($tempPrejsFile) && isset($_FILES['prejsFiles']['error'][$i]) && $_FILES['prejsFiles']['error'][$i] == UPLOAD_ERR_OK) {
-							$ext = pathinfo($filePrejsName, PATHINFO_EXTENSION);
-							if (in_array($ext, array('js'))) {
-								if ( move_uploaded_file($tempPrejsFile , $uploadPrejsFile )) {
-									if ($prejsList != '') {
-										$prejsList = $prejsList.",";
-										$prejsOrgList = $prejsOrgList.",";
-									}
-									$prejsList = $prejsList.'./tmp/'.$randTime.'_'.$filePrejsName;
-									$prejsOrgList = $prejsOrgList.$filePrejsName;
-									$prejsFlg = 1;
-								}
-							}
-						}
-					}
-					if ($prejsFlg == 1) {
-						echo "document.getElementById('prejs').value = `".$prejsOrgList."`;";
-						echo "document.getElementById('prejf').value = `".$prejsList."`;\n";
-					}
-						
-				?>
+                // ▼ カスタムCSS
+                if (serverData.upload.css.length > 0) {
+                    document.getElementById('cf1').value = serverData.post.cf1 || '';
+                    document.getElementById('cf2').value = serverData.post.cf2 || '';
+
+                    const cssList = serverData.upload.css.map(f => `(..)/tmp/${f}`).join(',');
+                    document.getElementById('cf').value = cssList;
+                    document.getElementById('dos').value += `|customCss=${cssList}|`;
+                }
+
+                // ▼ 画像
+                if (serverData.upload.img.length > 0) {
+                    // 表示用は PHP 側で作った元ファイル名リスト
+                    document.getElementById('imgs').value = serverData.post.imgs || '';
+                    // 読み込み用はタイムスタンプ付きファイル名
+                    document.getElementById('imgf').value = serverData.upload.img.join(',');
+                }
+
+                // ▼ プリロードJS
+                if (serverData.upload.prejs.length > 0) {
+                    // 表示用（元ファイル名）
+                    document.getElementById('prejs').value = serverData.post.prejs || '';
+
+                    // 読み込み用（タイムスタンプ付き）
+                    const preList = serverData.upload.prejs.map(f => `./tmp/${f}`).join(',');
+                    document.getElementById('prejf').value = preList;
+                }
+
                 let versionj = 0;
 
                 // 選択したバージョンに関する情報取得
