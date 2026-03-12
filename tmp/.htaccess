@@ -1,0 +1,5 @@
+SetEnvIf Request_URI "\.(mp3|wav|ogg|mp4|m4a|aac|flac|js|css|txt|html|htm|png|jpg|jpeg|gif|svg|webp)$" deny_ref
+SetEnvIf Referer "tickle\.cloudfree\.jp" !deny_ref
+Order Allow,Deny
+Allow from all
+Deny from env=deny_ref
