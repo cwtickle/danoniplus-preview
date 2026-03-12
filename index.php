@@ -856,7 +856,7 @@ const serverData = <?php echo json_encode([
                     // 読み込み用（タイムスタンプ付き）
                     const jsList = serverData.upload.js.map(f => `(..)/tmp/${f}`).join(',');
                     document.getElementById('jf').value = jsList;
-                    document.getElementById('dos').value += `|customJs=${jsList}|`;
+                    document.getElementById('dos').value += `|customjs=${jsList}|`;
                 }
 
                 // ▼ カスタムCSS
@@ -866,7 +866,7 @@ const serverData = <?php echo json_encode([
 
                     const cssList = serverData.upload.css.map(f => `(..)/tmp/${f}`).join(',');
                     document.getElementById('cf').value = cssList;
-                    document.getElementById('dos').value += `|customCss=${cssList}|`;
+                    document.getElementById('dos').value += `|customcss=${cssList}|`;
                 }
 
                 // ▼ 画像
@@ -886,6 +886,9 @@ const serverData = <?php echo json_encode([
                     const preList = serverData.upload.prejs.map(f => `./tmp/${f}`).join(',');
                     document.getElementById('prejf').value = preList;
                 }
+
+                // ▼ 時間
+                document.getElementById('time').value = serverData.upload.time;
 
                 let versionj = 0;
 
