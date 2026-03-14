@@ -1080,7 +1080,7 @@ const serverData = <?php echo json_encode([
 
                 const imgs = document.getElementById(`imgs`).value?.split(`,`);
                 const imgf = document.getElementById(`imgf`).value?.split(`,`);
-                imgs.forEach((img, j) =>
+                imgs.filter(img => img !== ``).forEach((img, j) =>
                     document.getElementById('dos').value = document.getElementById('dos').value.replaceAll(img, `./tmp/${imgf[j]}`));
 
                 // ダウンロードボタンの処理
