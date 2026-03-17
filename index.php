@@ -1129,8 +1129,8 @@ const serverData = <?php echo json_encode([
 
                         const matches = textAfter.match(/\|musicTitle=(.*?)\|/);
                         const musicTitles = (matches && matches.length >= 2 ? matches[1] : ``).split(`,`);
-                        textAfter = textAfter.replace(`<<MUSIC_TITLE>>`, musicTitles[0] || `Preview`);
-                        textAfter = textAfter.replace(`<<ARTIST_NAME>>`, musicTitles[1] || `---`);
+                        textAfter = textAfter.replace(`<<MUSIC_TITLE>>`, escapeHtml(musicTitles[0] || `Preview`))
+                        textAfter = textAfter.replace(`<<ARTIST_NAME>>`, escapeHtml(musicTitles[1] || `---`));
 
                         // バージョンに応じて参照するファイルを変更
                         // v32以前はデフォルトCSSが用意されていないため、v33で置き換える
