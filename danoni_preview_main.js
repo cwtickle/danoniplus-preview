@@ -1,4 +1,4 @@
-/**
+﻿/**
  * index.php (ローカル版) と index2.php (CDN/jsdelivr版) で共有するメイン処理。
  *
  * 呼び出し側は先に serverData (各PHPが出力する <script> ブロック) を

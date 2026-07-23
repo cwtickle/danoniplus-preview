@@ -1,4 +1,4 @@
-/**
+﻿/**
  * preview_classic.php 専用のスクリプト。
  *
  * loadScript_local / importCssFile_local / compareVersions / removeKeySave /
