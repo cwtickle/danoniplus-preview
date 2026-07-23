@@ -356,7 +356,17 @@ const initDanoniPreview = (config) => {
 
     if (gameMode.value !== '') {
         if (compareVersions(baseVersion, '45.0.0') >= 0) {
-            applyCustomJs(gameMode.value);
+            if (gameMode.value === `kstyle`) {
+                const cdnUrl = `https://cdn.jsdelivr.net/gh/cwtickle/kirizma-cw@v3/js/kstyle.js`;
+                arrayCustomJs.push(cdnUrl);
+                document.getElementById(`srcjs`).href = cdnUrl;
+            } else if (gameMode.value === `pstyle` || gameMode.value === `pstyle_dp`) {
+                const cdnUrl = `https://cdn.jsdelivr.net/gh/cwtickle/punching-panels@v2/js/pstyle.js`;
+                arrayCustomJs.push(cdnUrl);
+                document.getElementById(`srcjs`).href = cdnUrl;
+            } else {
+                applyCustomJs(gameMode.value);
+            }
         } else if (compareVersions(baseVersion, '39.0.0') >= 0) {
             applyCustomJs(gameMode.value, `v44/`);
         } else {
@@ -392,7 +402,17 @@ const initDanoniPreview = (config) => {
     };
     if (gameMode.value !== '') {
         if (compareVersions(baseVersion, '45.0.0') >= 0) {
-            applyCustomCss(gameMode.value);
+            if (gameMode.value === `kstyle`) {
+                const cdnUrl = `https://cdn.jsdelivr.net/gh/cwtickle/kirizma-cw@v3/css/kstyle.css`;
+                arrayCustomCss.push(cdnUrl);
+                document.getElementById(`srccss`).href = cdnUrl;
+            } else if (gameMode.value === `pstyle` || gameMode.value === `pstyle_dp`) {
+                const cdnUrl = `https://cdn.jsdelivr.net/gh/cwtickle/punching-panels@v2/css/pstyle.css`;
+                arrayCustomCss.push(cdnUrl);
+                document.getElementById(`srccss`).href = cdnUrl;
+            } else {
+                applyCustomCss(gameMode.value);
+            }
         } else if (compareVersions(baseVersion, '39.0.0') >= 0) {
             applyCustomCss(gameMode.value, `v44/`);
         } else {
