@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/common.php';
+
 $getParamPath = '';
 if (isset($_GET["v"])) {
 	$testPath = "https://cdn.jsdelivr.net/npm/danoniplus@".$_GET["v"]."/js/danoni_main.js";
@@ -16,61 +18,6 @@ if ($_SERVER['HTTP_HOST'] === 'danonicw.skr.jp') {
     $rootUrl = 'https://ss1.xrea.com/cw7.g3.xrea.com/preview/';
 }
 
-/**
- * 譜面データのエスケープ処理
- *
- * @param String $str
- * @return void
- */
-function escapeStr($str) {
-	$escList = [['`', '*bkquo*'], ["'", '*squo*']];
-	$repStr = $str;
-	foreach ($escList as $vals) {
-		$repStr = str_ireplace($vals[0], $vals[1], $repStr);
-	}
-	return $repStr;
-}
-
-/**
- * 音源ファイル名のエスケープ処理
- *
- * @param String $str
- * @return void
- */
-function escapeStrMusic($str) {
-	$escList = [['&', '_amp_'], ["'", '_sq_']];
-	$repStr = $str;
-	foreach ($escList as $vals) {
-		$repStr = str_ireplace($vals[0], $vals[1], $repStr);
-	}
-	return $repStr;
-}
-
-/**
- * バージョン番号の比較 (x.y.z-a1 形式)
- * @param String $versionA
- * @param String $versionB
- * @return Number
- */
-function compareSemanticVersions($versionA, $versionB) {
-    $a = explode('.', str_replace('-', '.', $versionA));
-    $b = explode('.', str_replace('-', '.', $versionB));
-
-    $len = max(count($a), count($b));
-
-    for ($i = 0; $i < $len; $i++) {
-        $partA = isset($a[$i]) ? intval($a[$i], 36) : 0;
-        $partB = isset($b[$i]) ? intval($b[$i], 36) : 0;
-
-        if ($partA < $partB) {
-            return -1;
-        } elseif ($partA > $partB) {
-            return 1;
-        }
-    }
-
-    return 0;
-}
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -953,7 +900,6 @@ const serverData = <?php echo json_encode([
 
                         } else if (gameMode.value === `kstyle`) {
                             // キリズマ
-                            document.getElementById('dos').value += `|imgType=kirizma,svg,true,0|`;
                             if (document.getElementById('dos').value.indexOf(`|difData=`) < 0) {
                                 document.getElementById('dos').value += `|difData=27k|`;
                             }
