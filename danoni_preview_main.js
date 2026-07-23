@@ -182,6 +182,19 @@ const initDanoniPreview = (config) => {
     let baseVersionUrl = ``;
     let baseVersion = ``;
     let latestMajor = ``;
+
+    // バージョンに応じた各種リンク (Release, UpdateInfo, Changelog) の設定
+    const applyVersionLinks = (optionElement) => {
+        const versionText = optionElement.text.slice(1);
+        const majorVersion = versionText.split(`.`)[0];
+        const versionTag = optionElement.text.split('(').join('-').split(' ').join('-').split('-')[0];
+        document.getElementById('versionLink').href = `https://github.com/cwtickle/danoniplus/releases/tag/${versionTag}`;
+        document.getElementById('updateInfo').href = `https://github.com/cwtickle/danoniplus/wiki/UpdateInfo#-v${majorVersion}-changelog`;
+        document.getElementById('changelog').href = (latestMajor === majorVersion) ?
+            `https://github.com/cwtickle/danoniplus/wiki/Changelog-latest` :
+            `https://github.com/cwtickle/danoniplus/wiki/Changelog-v${majorVersion}`;
+    };
+
     for (let j = 0; j < vElements.length; j++) {
         if (j === 0) {
             latestMajor = vElements[j].text.slice(1).split(`.`)[0];
@@ -193,16 +206,8 @@ const initDanoniPreview = (config) => {
             baseVersion = vElements[j].text.slice(1);
             document.getElementById(`cver`).innerHTML = `v${baseVersion}`;
 
-            const majorVersion = baseVersion.split(`.`)[0];
-            if (vElements[j].value === ``) { } else {
-                const version = vElements[j].text.split('(').join('-').split(' ').join('-').split('-')[0];
-                document.getElementById('versionLink').href = `https://github.com/cwtickle/danoniplus/releases/tag/${version}`;
-                document.getElementById('updateInfo').href = `https://github.com/cwtickle/danoniplus/wiki/UpdateInfo#-v${majorVersion}-changelog`;
-                if (latestMajor === majorVersion) {
-                    document.getElementById('changelog').href = `https://github.com/cwtickle/danoniplus/wiki/Changelog-latest`;
-                } else {
-                    document.getElementById('changelog').href = `https://github.com/cwtickle/danoniplus/wiki/Changelog-v${majorVersion}`;
-                }
+            if (vElements[j].value !== ``) {
+                applyVersionLinks(vElements[j]);
             }
         }
     }
@@ -214,15 +219,7 @@ const initDanoniPreview = (config) => {
         baseVersion = vElements[0].text.slice(1);
         document.getElementById(`cver`).innerHTML = `v${baseVersion}`;
 
-        const majorVersion = baseVersion.split(`.`)[0];
-        const version = vElements[0].text.split('(').join('-').split(' ').join('-').split('-')[0];
-        document.getElementById('versionLink').href = `https://github.com/cwtickle/danoniplus/releases/tag/${version}`;
-        document.getElementById('updateInfo').href = `https://github.com/cwtickle/danoniplus/wiki/UpdateInfo#-v${majorVersion}-changelog`;
-        if (latestMajor === majorVersion) {
-            document.getElementById('changelog').href = `https://github.com/cwtickle/danoniplus/wiki/Changelog-latest`;
-        } else {
-            document.getElementById('changelog').href = `https://github.com/cwtickle/danoniplus/wiki/Changelog-v${majorVersion}`;
-        }
+        applyVersionLinks(vElements[0]);
     }
 
     if (versionj === 0) {
@@ -624,6 +621,14 @@ const initDanoniPreview = (config) => {
     };
     loadScripts();
 
+    // 旧バージョン (v19.4.0未満) の場合のみ専用の遷移先URLを組み立てる
+    const computeRedirectUrl = (versionText, versionValue) => {
+        if (config.supportsOldVersions && compareVersions(versionText, '19.4.0') < 0) {
+            return versionValue.slice(1, -17) + `preview/`;
+        }
+        return config.baseAction;
+    };
+
     // バージョン変更時の処理
     const getVersion = obj => {
         const idx = obj.selectedIndex;
@@ -631,10 +636,7 @@ const initDanoniPreview = (config) => {
         const value = obj.options[idx].value;
         const versionTxt = (value === `` || idx === -1) ? `10000.0.0` : text.slice(1);
 
-        let redirectUrl = config.baseAction;
-        if (config.supportsOldVersions && compareVersions(versionTxt, '19.4.0') < 0) {
-            redirectUrl = value.slice(1, -17) + `preview/`;
-        }
+        const redirectUrl = computeRedirectUrl(versionTxt, value);
         document.getElementById('formV').action = redirectUrl + queryParams;
         document.getElementById('formV').submit();
     };
@@ -650,10 +652,7 @@ const initDanoniPreview = (config) => {
         versionj++;
         document.getElementById(`v`).value = vElements[versionj].value;
 
-        let redirectUrl = config.baseAction;
-        if (config.supportsOldVersions && compareVersions(vElements[versionj].text.slice(1), '19.4.0') < 0) {
-            redirectUrl = vElements[versionj].value.slice(1, -17) + `preview/`;
-        }
+        const redirectUrl = computeRedirectUrl(vElements[versionj].text.slice(1), vElements[versionj].value);
         document.getElementById('formV').action = redirectUrl + queryParams;
         document.getElementById('formV').submit();
     };
