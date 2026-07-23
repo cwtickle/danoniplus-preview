@@ -37,53 +37,8 @@ if ($_SERVER['HTTP_HOST'] === 'danonicw.skr.jp') {
 
     <title>Dancing☆Onigiri Preview (jsdelivr)</title>
 
+    <link rel="stylesheet" href="./danoni_preview_common.css">
     <style type="text/css">
-    a:visited {
-        color: #BAB7E0;
-    }
-
-    a:active {
-        color: #CCCCCC;
-    }
-
-    body {
-        font-family: "Arial", "メイリオ", "MS P ゴシック", sans-serif;
-        color: #cccccc;
-        background-color: #000011;
-        font-size: 14px;
-    }
-
-    table {
-        border: 0;
-        border-collapse: collapse;
-        width: 80%;
-        margin: auto;
-    }
-
-    .title {
-        font-family: "Merriweather", "Arial", "メイリオ", "MS P ゴシック", sans-serif;
-        font-size: 24px;
-    }
-
-    .title1 {
-        color: #9999ff;
-        font-size: 24px;
-    }
-
-    .title2 {
-        color: #ff9999;
-        font-size: 24px;
-    }
-
-    .title3 {
-        color: #ffff99;
-        font-size: 24px;
-    }
-
-    .ver {
-        font-size: 16px;
-    }
-
     th,
     td {
         padding: 2px;
@@ -91,28 +46,6 @@ if ($_SERVER['HTTP_HOST'] === 'danonicw.skr.jp') {
 
     tr:nth-child(2n) {
         background: #333333;
-    }
-
-    textarea {
-        width: 99.5%;
-        height: 200px;
-        font-size: 14px;
-    }
-
-    input[type=text]:read-only {
-        width: 25%;
-        background-color: #aaaaaa;
-    }
-
-    a {
-        text-decoration: none;
-        color: #BAB7E0;
-    }
-
-    a:hover {
-        color: #FF9900;
-        text-decoration: underline;
-        cursor: pointer;
     }
 
     .advanced {
@@ -125,24 +58,6 @@ if ($_SERVER['HTTP_HOST'] === 'danonicw.skr.jp') {
         background: #330000;
         border: solid 1px #cccccc;
         text-align: center;
-    }
-
-    .select {
-        border-radius: 5px;
-        position: relative;
-        font-size: 15px;
-        padding: 5px 3px;
-    }
-
-    input[type=file] {
-        width: 60%;
-        height: 40px;
-        border: 1px dashed #999999;
-    }
-
-    input[type=file]:hover {
-        cursor: pointer;
-        background: #66666699;
     }
     </style>
 <?php
