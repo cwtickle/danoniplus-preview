@@ -276,6 +276,7 @@ const serverData = <?php echo json_encode([
         'queryParams' => $_POST['queryParams'] ?? '',
         'cjd'      => $_POST['cjd']      ?? '',
         'g'        => $_POST['g']        ?? '',
+        'w'        => $_POST['w']        ?? '',
         'h'        => $_POST['h']        ?? '500px',
         'time'     => $_POST['time']     ?? '',
     ],
@@ -1076,7 +1077,7 @@ const serverData = <?php echo json_encode([
                         if (compareVersions(baseVersion, '19.4.0') < 0) {
 
                         } else if (compareVersions(baseVersion, '27.1.0') < 0) {
-                            const width_g = `<?php echo isset($_POST["w"]) ? $_POST["w"] : ''; ?>` || `800px`;
+                            const width_g = serverData.post.w || `800px`;
                             const list = document.getElementById('w');
                             const elements = list.options;
                             for (let j = 0; j < elements.length; j++) {
@@ -1090,7 +1091,7 @@ const serverData = <?php echo json_encode([
                             document.getElementById('canvas-frame').style.margin = `auto`;
 
                         } else if (compareVersions(baseVersion, '33.6.0') >= 0) {
-                            const height_g = `<?php echo isset($_POST["h"]) ? $_POST["h"] : ''; ?>` || `500px`;
+                            const height_g = serverData.post.h || `500px`;
                             const list = document.getElementById('h');
                             const elements = list.options;
                             for (let j = 0; j < elements.length; j++) {

@@ -259,6 +259,7 @@ const serverData = <?php echo json_encode([
         'queryParams' => $_POST['queryParams'] ?? '',
         'cjd'      => $_POST['cjd']      ?? '',
         'g'        => $_POST['g']        ?? '',
+        'w'        => $_POST['w']        ?? '',
         'h'        => $_POST['h']        ?? '500px',
         'time'     => $_POST['time']     ?? '',
         'v'        => $_POST['v']        ?? '',
@@ -1063,7 +1064,7 @@ const serverData = <?php echo json_encode([
                     // danoni_main.jsの読込
                     if (dosData !== null) {
                         
-                        const height_g = `<?php echo isset($_POST["h"]) ? $_POST["h"] : ''; ?>` || `500px`;
+                        const height_g = serverData.post.h || `500px`;
                         const list = document.getElementById('h');
                         const elements = list.options;
                         for (let j = 0; j < elements.length; j++) {
