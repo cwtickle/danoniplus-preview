@@ -342,6 +342,18 @@ const initDanoniPreview = (config) => {
         document.getElementById('dos').value += `|musicUrl=(..)/tmp/${document.getElementById('time').value + `_` + document.getElementById('mf').value}|`;
     }
 
+    // v45.0.0以降、CDNから参照するゲームモード別の追加ライブラリ設定
+    // (kstyle, pstyle, pstyle_dp 以外は従来通りローカルの scriptLib を参照する)
+    const cdnLibConfig = {
+        kstyle: { repo: `cwtickle/kirizma-cw@v3`, file: `kstyle` },
+        pstyle: { repo: `cwtickle/punching-panels@v2`, file: `pstyle` },
+        pstyle_dp: { repo: `cwtickle/punching-panels@v2`, file: `pstyle` },
+    };
+    const resolveCdnLibUrl = (_type) => {
+        const cfg = cdnLibConfig[gameMode.value];
+        return cfg ? `https://cdn.jsdelivr.net/gh/${cfg.repo}/${_type}/${cfg.file}.${_type}` : null;
+    };
+
     // カスタムJSファイルの設定
     const arrayCustomJs = [];
     const applyCustomJs = (_val, _subDirectory = ``) => {
@@ -356,12 +368,8 @@ const initDanoniPreview = (config) => {
 
     if (gameMode.value !== '') {
         if (compareVersions(baseVersion, '45.0.0') >= 0) {
-            if (gameMode.value === `kstyle`) {
-                const cdnUrl = `https://cdn.jsdelivr.net/gh/cwtickle/kirizma-cw@v3/js/kstyle.js`;
-                arrayCustomJs.push(cdnUrl);
-                document.getElementById(`srcjs`).href = cdnUrl;
-            } else if (gameMode.value === `pstyle` || gameMode.value === `pstyle_dp`) {
-                const cdnUrl = `https://cdn.jsdelivr.net/gh/cwtickle/punching-panels@v2/js/pstyle.js`;
+            const cdnUrl = resolveCdnLibUrl(`js`);
+            if (cdnUrl) {
                 arrayCustomJs.push(cdnUrl);
                 document.getElementById(`srcjs`).href = cdnUrl;
             } else {
@@ -402,12 +410,8 @@ const initDanoniPreview = (config) => {
     };
     if (gameMode.value !== '') {
         if (compareVersions(baseVersion, '45.0.0') >= 0) {
-            if (gameMode.value === `kstyle`) {
-                const cdnUrl = `https://cdn.jsdelivr.net/gh/cwtickle/kirizma-cw@v3/css/kstyle.css`;
-                arrayCustomCss.push(cdnUrl);
-                document.getElementById(`srccss`).href = cdnUrl;
-            } else if (gameMode.value === `pstyle` || gameMode.value === `pstyle_dp`) {
-                const cdnUrl = `https://cdn.jsdelivr.net/gh/cwtickle/punching-panels@v2/css/pstyle.css`;
+            const cdnUrl = resolveCdnLibUrl(`css`);
+            if (cdnUrl) {
                 arrayCustomCss.push(cdnUrl);
                 document.getElementById(`srccss`).href = cdnUrl;
             } else {
