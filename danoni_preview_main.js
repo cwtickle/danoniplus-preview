@@ -231,6 +231,39 @@ const initDanoniPreview = (config) => {
     // ImgType（ノートスキン）のデフォルト設定
     // ゲームモード別のキー数設定
     const gameMode = document.getElementById('g');
+    const CLASSIC_IMG_TYPE = `$classic,png$classic-thin,png$note,svg,false,10$fish,svg`;
+
+    // gameMode別の設定テーブル (v23.1.0 & v31.3.1以降にのみ適用)
+    const gameModeConfig = {
+        pstyle: {
+            imgType: `panels,svg,true,0`,
+            applyDifKey: `18p`,
+            editorLink: `https://suzme.github.io/punpane-editor/`,
+            resetDifData: true,
+            readOnlyDif: true,
+        },
+        pstyle_dp: {
+            imgType: `panels,svg,true,0`,
+            applyDifKey: `36p`,
+            editorLink: `https://suzme.github.io/punpane-editor/?key=36p`,
+            resetDifData: true,
+            readOnlyDif: true,
+        },
+        kstyle: {
+            // 既存のdifDataがあればそのまま維持する (force置換はしない)
+            defaultDifKey: `27k`,
+            editorLink: `https://suzme.github.io/kirizma-converter/`,
+            editorLinkLabel: `Converter`,
+        },
+        '9tkey': {
+            imgType: CLASSIC_IMG_TYPE,
+            applyDifKey: `9t`,
+            editorLink: `https://suzme.github.io/punpane-editor/?key=9t`,
+            resetDifData: true,
+            readOnlyDif: true,
+        },
+    };
+
     if (compareVersions(baseVersion, '23.1.0') >= 0) {
         if (compareVersions(baseVersion, '31.3.1') >= 0) {
 
@@ -248,57 +281,45 @@ const initDanoniPreview = (config) => {
                 return `|difData=${difDataAfter.join('$')}|`;
             };
 
-            if (gameMode.value === `pstyle`) {
-                // Punching◇Panels (Single)
-                document.getElementById('dos').value += `|imgType=panels,svg,true,0|`;
+            // difDataが未設定なら既定値を、既に設定済みならキー部分だけ置き換える
+            // (pstyle / pstyle_dp / 9tkey で共通のパターン。kstyleは既存データがあれば
+            //  そのまま維持する仕様のため、defaultDifKeyという別扱いにしている)
+            const applyDifDataKey = _key => {
                 if (document.getElementById('dos').value.indexOf(`|difData=`) < 0) {
-                    document.getElementById('dos').value += `|difData=18p|`;
+                    document.getElementById('dos').value += `|difData=${_key}|`;
                 } else {
-                    document.getElementById('dos').value += replaceDifs(`18p`);
+                    document.getElementById('dos').value += replaceDifs(_key);
+                }
+            };
+
+            const cfg = gameModeConfig[gameMode.value];
+            if (cfg) {
+                if (cfg.imgType) {
+                    document.getElementById('dos').value += `|imgType=${cfg.imgType}|`;
+                }
+                if (cfg.applyDifKey) {
+                    applyDifDataKey(cfg.applyDifKey);
+                } else if (cfg.defaultDifKey && document.getElementById('dos').value.indexOf(`|difData=`) < 0) {
+                    document.getElementById('dos').value += `|difData=${cfg.defaultDifKey}|`;
                 }
 
-                document.getElementById('editorLink').href = `https://suzme.github.io/punpane-editor/`;
-                difData_g = ``;
-                document.getElementById('k').readOnly = true;
-
-            } else if (gameMode.value === `pstyle_dp`) {
-                // Punching◇Panels (Double)
-                document.getElementById('dos').value += `|imgType=panels,svg,true,0|`;
-                if (document.getElementById('dos').value.indexOf(`|difData=`) < 0) {
-                    document.getElementById('dos').value += `|difData=36p|`;
-                } else {
-                    document.getElementById('dos').value += replaceDifs(`36p`);
+                document.getElementById('editorLink').href = cfg.editorLink;
+                if (cfg.editorLinkLabel) {
+                    document.getElementById('editorLink').innerHTML = cfg.editorLinkLabel;
                 }
-                document.getElementById('editorLink').href = `https://suzme.github.io/punpane-editor/?key=36p`;
-                difData_g = ``;
-                document.getElementById('k').readOnly = true;
-
-            } else if (gameMode.value === `kstyle`) {
-                // キリズマ
-                if (document.getElementById('dos').value.indexOf(`|difData=`) < 0) {
-                    document.getElementById('dos').value += `|difData=27k|`;
-                }
-                document.getElementById('editorLink').href = `https://suzme.github.io/kirizma-converter/`;
-                document.getElementById('editorLink').innerHTML = `Converter`;
-
-            } else {
-                // Dancing☆Onigiri
-                if (gameMode.value === `9tkey`) {
-                    if (document.getElementById('dos').value.indexOf(`|difData=`) < 0) {
-                        document.getElementById('dos').value += `|difData=9t|`;
-                    } else {
-                        document.getElementById('dos').value += replaceDifs(`9t`);
-                    }
-                    document.getElementById('editorLink').href = `https://suzme.github.io/punpane-editor/?key=9t`;
+                if (cfg.resetDifData) {
                     difData_g = ``;
-                    document.getElementById('k').readOnly = true;
-                } else {
-                    document.getElementById('editorLink').style.visibility = `hidden`;
                 }
-                document.getElementById('dos').value += `|imgType=$classic,png$classic-thin,png$note,svg,false,10$fish,svg|`;
+                if (cfg.readOnlyDif) {
+                    document.getElementById('k').readOnly = true;
+                }
+            } else {
+                // Dancing☆Onigiri (gameMode未選択)
+                document.getElementById('editorLink').style.visibility = `hidden`;
+                document.getElementById('dos').value += `|imgType=${CLASSIC_IMG_TYPE}|`;
             }
         } else {
-            document.getElementById('dos').value += `|imgType=$classic,png$classic-thin,png$note,svg,false,10$fish,svg|`;
+            document.getElementById('dos').value += `|imgType=${CLASSIC_IMG_TYPE}|`;
         }
     }
     if (compareVersions(baseVersion, '31.3.1') < 0) {
