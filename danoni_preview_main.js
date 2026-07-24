@@ -81,8 +81,20 @@ const compareVersions = (versionA, versionB) => {
     return 0; // versionA and versionB are equal
 };
 
-const initDanoniPreview = (config) => {
-
+// serverData.post の値をフォームへ反映し、アップロードされたファイル情報を
+// dos データ・各表示用フィールドへ反映する処理。
+// index.php / index2.php (initDanoniPreview 経由) と preview_classic.php の
+// 両方で構造が完全に共通だったため、パスのプレフィックスだけを _config 経由で
+// 受け取る形にして共通化している。
+//
+// _config.noSoundPath:   楽曲未指定時の音源パス
+// _config.uploadPrefix:  アップロードファイルの参照パスの接頭辞
+//                         { music, js, css, img, prejs } (img/prejsはnull可、
+//                         nullの場合はプレフィックス無しでそのまま使う)
+//
+// 戻り値: { dosData, difData_g, urlDomain, musicData_g }
+//   (difData_g は呼び出し側でその後の処理に応じて上書きされる想定のため let で受け取ること)
+const applyServerDataToForm = (_config) => {
     for (const [key, value] of Object.entries(serverData.post)) {
         const el = document.getElementById(key);
         if (el) el.value = value;
@@ -92,19 +104,15 @@ const initDanoniPreview = (config) => {
     const url = new URL(window.location.href);
     const params = url.searchParams;
     const urlDomain = url.origin;
-    const musicData_g = `|musicTitle=musicTitle,artistName,${urlDomain}|musicUrl=${config.noSoundPath}|`;
+    const musicData_g = `|musicTitle=musicTitle,artistName,${urlDomain}|musicUrl=${_config.noSoundPath}|`;
 
     const dosData = serverData.internal.escaped_d;
-    let difData_g = serverData.internal.escaped_k;
-
-    const version_g =
-        serverData.version.selected ||
-        serverData.version.param ||
-        serverData.version.latest ||
-        document.getElementById('v').options[0].value;
+    const difData_g = serverData.internal.escaped_k;
 
     document.getElementById('d').value = dosData;
     document.getElementById('dos').value = dosData;
+
+    const prefix = _config.uploadPrefix;
 
     // ▼ 楽曲ファイル
     if (serverData.upload.music) {
@@ -113,7 +121,7 @@ const initDanoniPreview = (config) => {
 
         // 読み込み用はタイムスタンプ付きファイル名
         document.getElementById('dos').value +=
-            `|musicUrl=(..)/tmp/${serverData.upload.music}|`;
+            `|musicUrl=${prefix.music}${serverData.upload.music}|`;
     }
 
     // ▼ 譜面ファイル
@@ -138,7 +146,7 @@ const initDanoniPreview = (config) => {
         document.getElementById('jf3').value = serverData.post.jf3 || '';
 
         // 読み込み用（タイムスタンプ付き）
-        const jsList = serverData.upload.js.map(f => `(..)/tmp/${f}`).join(',');
+        const jsList = serverData.upload.js.map(f => `${prefix.js}${f}`).join(',');
         document.getElementById('jf').value = jsList;
         document.getElementById('dos').value += `|customjs=${jsList}|`;
     }
@@ -148,7 +156,7 @@ const initDanoniPreview = (config) => {
         document.getElementById('cf1').value = serverData.post.cf1 || '';
         document.getElementById('cf2').value = serverData.post.cf2 || '';
 
-        const cssList = serverData.upload.css.map(f => `(..)/tmp/${f}`).join(',');
+        const cssList = serverData.upload.css.map(f => `${prefix.css}${f}`).join(',');
         document.getElementById('cf').value = cssList;
         document.getElementById('dos').value += `|customcss=${cssList}|`;
     }
@@ -158,7 +166,9 @@ const initDanoniPreview = (config) => {
         // 表示用は PHP 側で作った元ファイル名リスト
         document.getElementById('imgs').value = serverData.post.imgs || '';
         // 読み込み用はタイムスタンプ付きファイル名
-        document.getElementById('imgf').value = serverData.upload.img.join(',');
+        document.getElementById('imgf').value = prefix.img
+            ? serverData.upload.img.map(f => `${prefix.img}${f}`).join(',')
+            : serverData.upload.img.join(',');
     }
 
     // ▼ プリロードJS
@@ -167,12 +177,35 @@ const initDanoniPreview = (config) => {
         document.getElementById('prejs').value = serverData.post.prejs || '';
 
         // 読み込み用（タイムスタンプ付き）
-        const preList = serverData.upload.prejs.map(f => `./tmp/${f}`).join(',');
+        const preList = serverData.upload.prejs.map(f => `${prefix.prejs}${f}`).join(',');
         document.getElementById('prejf').value = preList;
     }
 
     // ▼ 時間
     document.getElementById('time').value = serverData.upload.time;
+
+    return { dosData, difData_g, urlDomain, musicData_g };
+};
+
+const initDanoniPreview = (config) => {
+
+    const { dosData, difData_g: initialDifData_g, urlDomain, musicData_g } = applyServerDataToForm({
+        noSoundPath: config.noSoundPath,
+        uploadPrefix: {
+            music: `(..)/tmp/`,
+            js: `(..)/tmp/`,
+            css: `(..)/tmp/`,
+            img: null,
+            prejs: `./tmp/`,
+        },
+    });
+    let difData_g = initialDifData_g;
+
+    const version_g =
+        serverData.version.selected ||
+        serverData.version.param ||
+        serverData.version.latest ||
+        document.getElementById('v').options[0].value;
 
     let versionj = 0;
 

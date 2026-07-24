@@ -2,97 +2,25 @@
  * preview_classic.php 専用のスクリプト。
  *
  * loadScript_local / importCssFile_local / compareVersions / removeKeySave /
- * cancelFile / confirmCancelFile は danoni_preview_main.js 側で定義済みのため、
+ * cancelFile / confirmCancelFile / applyServerDataToForm は
+ * danoni_preview_main.js 側で定義済みのため、
  * このファイルを読み込む前に danoni_preview_main.js を読み込んでおくこと。
  *
  *   <script src="<rootUrl>danoni_preview_main.js"></script>
  *   <script src="<rootUrl>danoni_preview_classic.js"></script>
  */
 
-for (const [key, value] of Object.entries(serverData.post)) {
-    const el = document.getElementById(key);
-    if (el) el.value = value;
-}
-
-// 譜面データ及び追加設定の初期化
-const url = new URL(window.location.href);
-const params = url.searchParams;
-const urlDomain = url.origin;
-const musicData_g = `|musicTitle=musicTitle,artistName,${urlDomain}|musicUrl=nosound.mp3|`;
-
-const dosData = serverData.internal.escaped_d;
-let difData_g = serverData.internal.escaped_k;
-
-document.getElementById('d').value = dosData;
-document.getElementById('dos').value = dosData;
-
-// ▼ 楽曲ファイル
-if (serverData.upload.music) {
-    // 表示用は元ファイル名（タイムスタンプなし）
-    document.getElementById('mf').value = serverData.post.mf || '';
-
-    // 読み込み用はタイムスタンプ付きファイル名
-    document.getElementById('dos').value +=
-        `|musicUrl=../music/${serverData.upload.music}|`;
-}
-
-// ▼ 譜面ファイル
-if (serverData.upload.dos) {
-    // 表示用（タイムスタンプなし）
-    document.getElementById('dosf1').value = serverData.post.dosf1 || '';
-    // 読み込み用（タイムスタンプ付き）
-    document.getElementById('dosf').value = serverData.upload.dos;
-}
-
-// ▼ HTMLテンプレート
-if (serverData.upload.html) {
-    document.getElementById('htmlf1').value = serverData.post.htmlf1 || '';
-    document.getElementById('htmlf').value = serverData.upload.html;
-}
-
-// ▼ カスタムJS
-if (serverData.upload.js.length > 0) {
-    // 表示用（タイムスタンプなし）
-    document.getElementById('jf1').value = serverData.post.jf1 || '';
-    document.getElementById('jf2').value = serverData.post.jf2 || '';
-    document.getElementById('jf3').value = serverData.post.jf3 || '';
-
-    // 読み込み用（タイムスタンプ付き）
-    const jsList = serverData.upload.js.map(f => `../music/${f}`).join(',');
-    document.getElementById('jf').value = jsList;
-    document.getElementById('dos').value += `|customjs=${jsList}|`;
-}
-
-// ▼ カスタムCSS
-if (serverData.upload.css.length > 0) {
-    document.getElementById('cf1').value = serverData.post.cf1 || '';
-    document.getElementById('cf2').value = serverData.post.cf2 || '';
-
-    const cssList = serverData.upload.css.map(f => `../music/${f}`).join(',');
-    document.getElementById('cf').value = cssList;
-    document.getElementById('dos').value += `|customcss=${cssList}|`;
-}
-
-// ▼ 画像
-if (serverData.upload.img.length > 0) {
-    // 表示用は PHP 側で作った元ファイル名リスト
-    document.getElementById('imgs').value = serverData.post.imgs || '';
-    // 読み込み用はタイムスタンプ付きファイル名
-    document.getElementById('imgf').value = serverData.upload.img.map(f => `../music/${f}`).join(',');
-}
-
-// ▼ プリロードJS
-if (serverData.upload.prejs.length > 0) {
-    // 表示用（元ファイル名）
-    document.getElementById('prejs').value = serverData.post.prejs || '';
-
-    // 読み込み用（タイムスタンプ付き）
-    const preList = serverData.upload.prejs.map(f => `../music/${f}`).join(',');
-    document.getElementById('prejf').value = preList;
-}
-
-// ▼ 時間
-document.getElementById('time').value = serverData.upload.time;
+const { dosData, difData_g: initialDifData_g, urlDomain, musicData_g } = applyServerDataToForm({
+    noSoundPath: `nosound.mp3`,
+    uploadPrefix: {
+        music: `../music/`,
+        js: `../music/`,
+        css: `../music/`,
+        img: `../music/`,
+        prejs: `../music/`,
+    },
+});
+let difData_g = initialDifData_g;
 
 // 楽曲名情報の設定 (musicUrlについては指定の有無によらず一旦"nosound.mp3"で上書きし、既存のデータは使わない)
 if (dosData.indexOf('|musicTitle=') !== -1) {
