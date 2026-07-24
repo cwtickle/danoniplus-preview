@@ -34,19 +34,6 @@ require_once __DIR__ . '/common.php';
     </style>
 <?php
 
-// ▼ アップロード結果を格納する配列
-$uploaded = [
-    'music' => '',
-    'js'    => [],
-    'css'   => [],
-    'dos'   => '',
-    'html'  => '',
-    'img'   => [],
-];
-
-// ▼ プリロードJS
-$uploadedPreJs = [];
-
 // ▼ ランダムタイムスタンプ
 if (isset($_POST['time']) && $_POST['time'] !== '') {
     $randTime = $_POST['time'];
@@ -54,234 +41,24 @@ if (isset($_POST['time']) && $_POST['time'] !== '') {
     $randTime = date('YmdHis');
 }
 
-/*-----------------------------------
- * 音源ファイル
- *-----------------------------------*/
-if (!empty($_FILES['musicFile']['tmp_name']) && $_FILES['musicFile']['error'] === UPLOAD_ERR_OK) {
-    $filename = escapeStrMusic(basename($_FILES['musicFile']['name']));
-    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-
-    if (in_array($ext, ['mp3','mp4','m4a','ogg','oga','aac','flac','js'])) {
-        $savedName = $randTime . '_' . $filename;
-        $uploadPath = $rootDir . '/tmp/' . $savedName;
-
-        if (move_uploaded_file($_FILES['musicFile']['tmp_name'], $uploadPath)) {
-            $uploaded['music'] = $savedName; // 読み込み用（タイムスタンプ付き）
-            $_POST['mf'] = $filename;        // 表示用（元ファイル名）
-        }
-    }
-}
-
-/*-----------------------------------
- * 譜面ファイル（dosFile1）
- *-----------------------------------*/
-if (!empty($_FILES['dosFile1']['tmp_name']) && $_FILES['dosFile1']['error'] === UPLOAD_ERR_OK) {
-    $filename = basename($_FILES['dosFile1']['name']);
-    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-
-    if (in_array($ext, ['js','txt'])) {
-        $savedName = $randTime . '_' . $filename;
-        $uploadPath = $rootDir . '/tmp/' . $savedName;
-
-        if (move_uploaded_file($_FILES['dosFile1']['tmp_name'], $uploadPath)) {
-            $uploaded['dos'] = $savedName;   // 読み込み用
-            $_POST['dosf1'] = $filename;     // 表示用
-        }
-    }
-}
-
-/*-----------------------------------
- * HTMLテンプレート
- *-----------------------------------*/
-if (!empty($_FILES['htmlFile']['tmp_name']) && $_FILES['htmlFile']['error'] === UPLOAD_ERR_OK) {
-    $filename = basename($_FILES['htmlFile']['name']);
-    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-
-    if (in_array($ext, ['html','htm'])) {
-        $savedName = $randTime . '_' . $filename;
-        $uploadPath = $rootDir . '/tmp/' . $savedName;
-
-        if (move_uploaded_file($_FILES['htmlFile']['tmp_name'], $uploadPath)) {
-            $uploaded['html'] = $savedName;  // 読み込み用
-            $_POST['htmlf1'] = $filename;    // 表示用
-        }
-    }
-}
-
-/*-----------------------------------
- * カスタムJS（3つ）
- *-----------------------------------*/
-for ($i = 1; $i <= 3; $i++) {
-    if (!empty($_FILES['jsFile'.$i]['tmp_name']) && $_FILES['jsFile'.$i]['error'] === UPLOAD_ERR_OK) {
-        $filename = basename($_FILES['jsFile'.$i]['name']);
-        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-
-        if ($ext === 'js') {
-            $savedName = $randTime . '_' . $filename;
-            $uploadPath = $rootDir . '/tmp/' . $savedName;
-
-            if (move_uploaded_file($_FILES['jsFile'.$i]['tmp_name'], $uploadPath)) {
-                $uploaded['js'][] = $savedName;   // 読み込み用
-                $_POST['jf'.$i] = $filename;      // 表示用
-            }
-        }
-    }
-}
-
-/*-----------------------------------
- * カスタムCSS（2つ）
- *-----------------------------------*/
-for ($i = 1; $i <= 2; $i++) {
-    if (!empty($_FILES['cssFile'.$i]['tmp_name']) && $_FILES['cssFile'.$i]['error'] === UPLOAD_ERR_OK) {
-        $filename = basename($_FILES['cssFile'.$i]['name']);
-        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-
-        if ($ext === 'css') {
-            $savedName = $randTime . '_' . $filename;
-            $uploadPath = $rootDir . '/tmp/' . $savedName;
-
-            if (move_uploaded_file($_FILES['cssFile'.$i]['tmp_name'], $uploadPath)) {
-                $uploaded['css'][] = $savedName;  // 読み込み用
-                $_POST['cf'.$i] = $filename;      // 表示用
-            }
-        }
-    }
-}
-
-/*-----------------------------------
- * 画像ファイル（複数）
- *-----------------------------------*/
-if (!empty($_FILES['imgFiles']['name'][0])) {
-    $imgList = [];
-
-    foreach ($_FILES['imgFiles']['name'] as $idx => $name) {
-        if ($_FILES['imgFiles']['error'][$idx] === UPLOAD_ERR_OK) {
-            $filename = basename($name);
-            $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-
-            if (in_array($ext, ['png','jpg','jpeg','gif','svg','webp'])) {
-                $savedName = $randTime . '_' . $filename;
-                $uploadPath = $rootDir . '/tmp/' . $savedName;
-
-                if (move_uploaded_file($_FILES['imgFiles']['tmp_name'][$idx], $uploadPath)) {
-                    $uploaded['img'][] = $savedName;   // 読み込み用
-                    $imgList[] = $filename;            // 表示用
-                }
-            }
-        }
-    }
-
-    $_POST['imgs'] = implode(',', $imgList);
-}
-
-/*-----------------------------------
- * プリロードJS（複数）
- *-----------------------------------*/
-if (!empty($_FILES['prejsFiles']['name'][0])) {
-    $preList = [];
-
-    foreach ($_FILES['prejsFiles']['name'] as $idx => $name) {
-        if ($_FILES['prejsFiles']['error'][$idx] === UPLOAD_ERR_OK) {
-            $filename = basename($name);
-            $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-
-            if ($ext === 'js') {
-                $savedName = $randTime . '_' . $filename;
-                $uploadPath = $rootDir . '/tmp/' . $savedName;
-
-                if (move_uploaded_file($_FILES['prejsFiles']['tmp_name'][$idx], $uploadPath)) {
-                    $uploadedPreJs[] = $savedName; // 読み込み用
-                    $preList[] = $filename;        // 表示用
-                }
-            }
-        }
-    }
-
-    $_POST['prejs'] = implode(',', $preList);
-}
+[$uploaded, $uploadedPreJs] = processFileUploads($rootDir, $randTime);
 
 ?>
 <script>
-const serverData = <?php echo json_encode([
-
-    // -----------------------------
-    // 1. POST で送られてくる値
-    // -----------------------------
-    'post' => [
-        'd'        => $_POST['d']        ?? '',
-        'k'        => $_POST['k']        ?? '',
-        'mf'       => $_POST['mf']       ?? '',
-        'jf'       => $_POST['jf']       ?? '',
-        'jf1'      => $_POST['jf1']      ?? '',
-        'jf2'      => $_POST['jf2']      ?? '',
-        'jf3'      => $_POST['jf3']      ?? '',
-        'cf'       => $_POST['cf']       ?? '',
-        'cf1'      => $_POST['cf1']      ?? '',
-        'cf2'      => $_POST['cf2']      ?? '',
-        'imgs'     => $_POST['imgs']     ?? '',
-        'imgf'     => $_POST['imgf']     ?? '',
-        'dosf'     => $_POST['dosf']     ?? '',
-        'dosf1'    => $_POST['dosf1']    ?? '',
-        'htmlf'    => $_POST['htmlf']    ?? '',
-        'htmlf1'   => $_POST['htmlf1']   ?? '',
-        'dosM'     => $_POST['dosM']     ?? 'UTF-8',
-        'prevals'  => $_POST['prevals']  ?? '',
-        'prejs'    => $_POST['prejs']    ?? '',
-        'prejf'    => $_POST['prejf']    ?? '',
-        'queryParams' => $_POST['queryParams'] ?? '',
-        'cjd'      => $_POST['cjd']      ?? '',
-        'g'        => $_POST['g']        ?? '',
-        'w'        => $_POST['w']        ?? '',
-        'h'        => $_POST['h']        ?? '500px',
-        'time'     => $_POST['time']     ?? '',
-        'v'        => $_POST['v']        ?? '',
-    ],
-
-    // -----------------------------
-    // 2. バージョン情報（ローカル版）
-    // -----------------------------
-    'version' => [
+const serverData = <?php echo json_encode(buildServerData(
+    $uploaded,
+    $uploadedPreJs,
+    $randTime,
+    $rootDir,
+    $rootUrl,
+    [
         'selected' => $_POST['v'] ?? '',
         'param'    => '',
         'latest'   => '',
         'type'     => 'local',
-    ],
-
-    // -----------------------------
-    // 3. サーバー環境情報
-    // -----------------------------
-    'env' => [
-        'rootDir' => $rootDir,
-        'rootUrl' => $rootUrl,
-        'host'    => $_SERVER['HTTP_HOST'],
-        'urlDomain' => (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'],
-    ],
-
-    // -----------------------------
-    // 4. PHP 内部で生成される値
-    // -----------------------------
-    'internal' => [
-        'escaped_d'       => escapeStr($_POST['d'] ?? ''),
-        'escaped_k'       => escapeStr($_POST['k'] ?? ''),
-        'escaped_prevals' => escapeStr($_POST['prevals'] ?? ''),
-        'escaped_query'   => escapeStr($_POST['queryParams'] ?? ''),
-    ],
-
-    // -----------------------------
-    // 5. アップロード結果（タイムスタンプ付き）
-    // -----------------------------
-    'upload' => [
-        'time'  => $randTime,
-        'music' => $uploaded['music'],
-        'js'    => $uploaded['js'],
-        'css'   => $uploaded['css'],
-        'dos'   => $uploaded['dos'],
-        'html'  => $uploaded['html'],
-        'img'   => $uploaded['img'],
-        'prejs' => $uploadedPreJs,
-    ],
-
-]); ?>;
+    ]
+));
+?>;
 </script>
 </head>
 
@@ -316,43 +93,17 @@ const serverData = <?php echo json_encode([
                             <td><select class="select" name="v" id="v" onchange="getVersion(this);">
 
                                     <?php
-									$matchingFiles = findFilesMatchingPattern();
-
-									// バージョン番号によるソート
-									usort($matchingFiles, function($a, $b) {
-										$versionA = extractVersionFromFilename($a);
-										$versionB = extractVersionFromFilename($b);
-										
-										return compareSemanticVersions($versionA, $versionB) * (-1);
-									});
-
-									if (empty($matchingFiles)) {
-									} else {
-										$prevVer = '';
-										foreach ($matchingFiles as $file) {
-											$bgcolor = '#ffffff';
-											$addSymbol = '';
-											$versionName = extractVersionFromFilename($file);
-											$versionMajor = explode('.', $versionName)[0];
-											if (strpos($versionName, '-') !== false) {
-												$bgcolor = '#ffbbbb';
-											} else if ($prevVer !== $versionMajor) {
-												if (strpos($versionName, '(final)') !== false) {
-													$bgcolor = '#eeaaee';
-												} else if (compareSemanticVersions($versionName, '1.0.0') < 0) {
-													$bgcolor = '#cccccc';
-												} else {
-													$bgcolor = ($prevVer == '' ? '#bbbbff' : '#dddd99');
-													$addSymbol = ' *';
-												}
-												$prevVer = $versionMajor;
-											} else if (compareSemanticVersions($versionName, '19.4.1') < 0) {
-												$bgcolor = '#cccccc';
-											}
-											echo '<option value="'.$file.'" style="background-color:'.$bgcolor.';">v'.$versionName.$addSymbol.'</option>'."\n";
-										}
-									}
-									?>
+                                    $matchingFiles = findFilesMatchingPattern();
+                                    renderVersionOptions(
+                                        $matchingFiles,
+                                        function ($file) {
+                                            return extractVersionFromFilename($file);
+                                        },
+                                        function ($file) {
+                                            return $file;
+                                        }
+                                    );
+                                    ?>
                                 </select><select class="select" name="w" id="w" onchange="getWidth(this);">
                                     <option value="500px">W: 500px</option>
                                     <option value="550px">W: 550px</option>
