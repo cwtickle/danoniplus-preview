@@ -187,6 +187,57 @@ const applyServerDataToForm = (_config) => {
     return { dosData, difData_g, urlDomain, musicData_g };
 };
 
+// ロケール、キー別、エディター関連以外のローカルストレージデータを消去し、
+// 作品別のローカルストレージ設定値を初期化する。
+// (index.php/index2.php と preview_classic.php とで、per-URLの前回値への
+//  フォールバックの有無・storageOrgが無い場合に書き込むかどうか・
+//  adjustmentの丸め方が異なるため、_config で指定する)
+//
+// _config.useCurrentFallback: storageOrgが無い場合、そのURL自体の前回値(storageCurrent)を使うか
+// _config.writeIfMissing:     baseStorageが無くても既定値で書き込むか
+// _config.bootstrapDomainDefault: storageOrgが無い場合に urlDomain/ 側にも既定値を書き込むか
+// _config.roundAdjustment:    function(adj): number  adjustment値の丸め処理
+//
+// 戻り値: { storageOrg, baseStorage }
+const applyLocalStorageDefaults = (_config) => {
+    // 作品別のローカルストレージデータを必要最低限に設定
+    // (クリーンアップより前に読み取る必要がある。クリーンアップの除外対象に
+    //  baseUrlキー自体は含まれないため、先に消してしまうと前回値を読めなくなる)
+    const baseUrl = new URL(location.href).toString();
+    const storageOrg = JSON.parse(localStorage.getItem(`${urlDomain}/`));
+    const storageCurrent = _config.useCurrentFallback ? JSON.parse(localStorage.getItem(baseUrl)) : null;
+    const baseStorage = storageOrg || storageCurrent;
+
+    // ロケール、キー別、エディター関連以外のローカルストレージデータを消去
+    const editorLS = [
+        `isKeyboard`, `isClick`, `isReverse`, `isHighlightedFreeze`,
+        `simultaneousThreshold`, `pageBlockNum`, `testPattern`,
+        `customKeyConfig`, `musicVolume`, `keyPhrases`, `saveData`, `orderGroupMap`,
+    ];
+    Object.keys(localStorage)
+        .filter(key => key !== `danoni-locale` && !key.startsWith(`danonicw-`) &&
+            key !== `${urlDomain}/` && !editorLS.includes(key))
+        .forEach(key => localStorage.removeItem(key));
+
+    if (_config.writeIfMissing || baseStorage) {
+        const adj = baseStorage?.adjustment || 0;
+        const storageData = JSON.stringify({
+            adjustment: _config.roundAdjustment(adj),
+            volume: baseStorage?.volume || 100,
+            appearance: baseStorage?.appearance || `Visible`,
+            opacity: baseStorage?.opacity || 100,
+            hitPosition: baseStorage?.hitPosition || 0,
+            colorType: baseStorage?.colorType || `Default`,
+        });
+        localStorage.setItem(baseUrl, storageData);
+        if (_config.bootstrapDomainDefault && !storageOrg) {
+            localStorage.setItem(`${urlDomain}/`, storageData);
+        }
+    }
+
+    return { storageOrg, baseStorage };
+};
+
 const initDanoniPreview = (config) => {
 
     const { dosData, difData_g: initialDifData_g, urlDomain, musicData_g } = applyServerDataToForm({
@@ -566,36 +617,12 @@ const initDanoniPreview = (config) => {
         });
     });
 
-    // 作品別のローカルストレージデータを必要最低限に設定
-    const baseUrl = new URL(location.href).toString();
-    const storageOrg = JSON.parse(localStorage.getItem(`${urlDomain}/`));
-    const storageCurrent = JSON.parse(localStorage.getItem(baseUrl));
-    const baseStorage = storageOrg || storageCurrent;
-
-    // ロケール、キー別、エディター関連以外のローカルストレージデータを消去
-    const editorLS = [
-        `isKeyboard`, `isClick`, `isReverse`, `isHighlightedFreeze`,
-        `simultaneousThreshold`, `pageBlockNum`, `testPattern`,
-        `customKeyConfig`, `musicVolume`, `keyPhrases`, `saveData`, `orderGroupMap`,
-    ];
-    Object.keys(localStorage)
-        .filter(key => key !== `danoni-locale` && !key.startsWith(`danonicw-`) &&
-            key !== `${urlDomain}/` && !editorLS.includes(key))
-        .forEach(key => localStorage.removeItem(key));
-
-    const adj = baseStorage?.adjustment || 0;
-    const storageData = JSON.stringify({
-        adjustment: compareVersions(baseVersion, '23.0.0') >= 0 ? adj : Math.round(adj),
-        volume: baseStorage?.volume || 100,
-        appearance: baseStorage?.appearance || `Visible`,
-        opacity: baseStorage?.opacity || 100,
-        hitPosition: baseStorage?.hitPosition || 0,
-        colorType: baseStorage?.colorType || `Default`,
+    applyLocalStorageDefaults({
+        useCurrentFallback: true,
+        writeIfMissing: true,
+        bootstrapDomainDefault: true,
+        roundAdjustment: (adj) => compareVersions(baseVersion, '23.0.0') >= 0 ? adj : Math.round(adj),
     });
-    localStorage.setItem(baseUrl, storageData);
-    if (!storageOrg) {
-        localStorage.setItem(`${urlDomain}/`, storageData);
-    }
 
     // プリロードする変数群の定義
     const prevals = document.getElementById(`prevals`).value?.split(`,`);

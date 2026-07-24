@@ -2,8 +2,8 @@
  * preview_classic.php 専用のスクリプト。
  *
  * loadScript_local / importCssFile_local / compareVersions / removeKeySave /
- * cancelFile / confirmCancelFile / applyServerDataToForm は
- * danoni_preview_main.js 側で定義済みのため、
+ * cancelFile / confirmCancelFile / applyServerDataToForm /
+ * applyLocalStorageDefaults は danoni_preview_main.js 側で定義済みのため、
  * このファイルを読み込む前に danoni_preview_main.js を読み込んでおくこと。
  *
  *   <script src="<rootUrl>danoni_preview_main.js"></script>
@@ -150,30 +150,12 @@ const dfCxt = evt => true;
     });
 });
 
-// ロケール、キー別、エディター関連以外のローカルストレージデータを消去
-const editorLS = [
-    `isKeyboard`, `isClick`, `isReverse`, `isHighlightedFreeze`,
-    `simultaneousThreshold`, `pageBlockNum`, `testPattern`,
-    `customKeyConfig`, `musicVolume`, `keyPhrases`, `saveData`, `orderGroupMap`,
-];
-Object.keys(localStorage)
-    .filter(key => key !== `danoni-locale` && !key.startsWith(`danonicw-`) &&
-        key !== `${urlDomain}/` && !editorLS.includes(key))
-    .forEach(key => localStorage.removeItem(key));
-
-// 作品別のローカルストレージデータを必要最低限に設定
-const baseUrl = new URL(location.href).toString();
-const storageOrg = JSON.parse(localStorage.getItem(`${urlDomain}/`));
-if (storageOrg) {
-    localStorage.setItem(baseUrl, JSON.stringify({
-        adjustment: Math.round(storageOrg.adjustment || 0),
-        volume: storageOrg.volume || 100,
-        appearance: storageOrg.appearance || `Visible`,
-        opacity: storageOrg.opacity || 100,
-        hitPosition: storageOrg.hitPosition || 0,
-        colorType: storageOrg.colorType || `Default`,
-    }));
-}
+const { storageOrg } = applyLocalStorageDefaults({
+    useCurrentFallback: false,
+    writeIfMissing: false,
+    bootstrapDomainDefault: false,
+    roundAdjustment: (adj) => Math.round(adj),
+});
 
 // danoni_main.jsの読込
 if (dosData !== null) {
