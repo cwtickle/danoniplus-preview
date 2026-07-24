@@ -236,14 +236,12 @@ const initDanoniPreview = (config) => {
     // gameMode別の設定テーブル (v23.1.0 & v31.3.1以降にのみ適用)
     const gameModeConfig = {
         pstyle: {
-            imgType: `panels,svg,true,0`,
             applyDifKey: `18p`,
             editorLink: `https://suzme.github.io/punpane-editor/`,
             resetDifData: true,
             readOnlyDif: true,
         },
         pstyle_dp: {
-            imgType: `panels,svg,true,0`,
             applyDifKey: `36p`,
             editorLink: `https://suzme.github.io/punpane-editor/?key=36p`,
             resetDifData: true,
