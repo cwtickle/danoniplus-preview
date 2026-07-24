@@ -26,14 +26,7 @@ if (isset($_GET["v"])) {
 		exit();
 	}
 }
-$rootDir = '';
-if ($_SERVER['HTTP_HOST'] === 'danonicw.skr.jp') {
-	$rootDir = '/home/cw7/www/danonicw';
-    $rootUrl = 'https://danonicw.skr.jp/';
-} else if ($_SERVER['HTTP_HOST'] === 'tickle.cloudfree.jp') {
-	$rootDir = '/home/tickle/tickle.cloudfree.jp/public_html';
-    $rootUrl = 'https://tickle.cloudfree.jp/';
-}
+[$rootDir, $rootUrl] = resolveRootPaths();
 
 ?>
 <!DOCTYPE html>
@@ -368,45 +361,15 @@ const serverData = <?php echo json_encode([
                                 <select class="select" name="v" id="v" onchange="getVersion(this);">
                                     <?php
 									$matchingFiles = findFilesMatchingPattern();
-
-									// バージョン番号によるソート
-									usort($matchingFiles, function($a, $b) {
-										$versionA = extractVersionFromFilename($a);
-										$versionB = extractVersionFromFilename($b);
-										
-										return compareSemanticVersions($versionA, $versionB) * (-1);
-									});
-
-									$latestVerPath = '';
-									if (empty($matchingFiles)) {
-									} else {
-										$prevVer = '';
-										foreach ($matchingFiles as $file) {
-											$bgcolor = '#ffffff';
-											$addSymbol = '';
-											$versionName = extractVersionFromFilename($file);
-											$versionMajor = explode('.', $versionName)[0];
-											if (strpos($versionName, '-') !== false) {
-												$bgcolor = '#ffbbbb';
-											} else if ($prevVer !== $versionMajor) {
-												if ($latestVerPath == '') {
-													$latestVerPath = $file;
-												}
-												if (strpos($versionName, '(final)') !== false) {
-													$bgcolor = '#eeaaee';
-												} else if (compareSemanticVersions($versionName, '1.0.0') < 0) {
-													$bgcolor = '#cccccc';
-												} else {
-													$bgcolor = ($prevVer == '' ? '#bbbbff' : '#dddd99');
-													$addSymbol = ' *';
-												}
-												$prevVer = $versionMajor;
-											} else if (compareSemanticVersions($versionName, '19.4.1') < 0) {
-												$bgcolor = '#cccccc';
-											}
-											echo '<option value="'.$file.'" style="background-color:'.$bgcolor.';">v'.$versionName.$addSymbol.'</option>'."\n";
+									$latestVerPath = renderVersionOptions(
+										$matchingFiles,
+										function ($file) {
+											return extractVersionFromFilename($file);
+										},
+										function ($file) {
+											return $file;
 										}
-									}
+									);
 
 									?>
                                 </select><select class="select" name="w" id="w" onchange="getWidth(this);">

@@ -90,3 +90,76 @@ function compareSemanticVersions($versionA, $versionB) {
 
     return 0;
 }
+
+/**
+ * ホスト名から配置先のルートディレクトリ・ルートURLを判定する
+ * (index.php / index2.php / preview_classic.php で共通)
+ *
+ * @return array{0: string, 1: string} [$rootDir, $rootUrl]
+ */
+function resolveRootPaths() {
+    $rootDir = '';
+    $rootUrl = '';
+    if ($_SERVER['HTTP_HOST'] === 'danonicw.skr.jp') {
+        $rootDir = '/home/cw7/www/danonicw';
+        $rootUrl = 'https://danonicw.skr.jp/';
+    } else if ($_SERVER['HTTP_HOST'] === 'tickle.cloudfree.jp') {
+        $rootDir = '/home/tickle/tickle.cloudfree.jp/public_html';
+        $rootUrl = 'https://tickle.cloudfree.jp/';
+    }
+    return [$rootDir, $rootUrl];
+}
+
+/**
+ * バージョン選択用の<option>一覧を出力する (index.php / index2.php で共通)
+ *
+ * $matchingFiles の並べ替え・背景色判定ロジックは完全に共通だが、
+ * バージョン文字列の取り出し方・<option value="...">の組み立て方が
+ * ローカル版(index.php)とCDN版(index2.php)とで異なるため、
+ * それぞれをコールバックとして受け取る。
+ *
+ * @param array $matchingFiles ソート前のファイル一覧 (ローカルパス、またはCDN版はバージョン文字列そのもの)
+ * @param callable $extractVersion function(string $file): string  $fileからバージョン文字列を取り出す
+ * @param callable $buildValue     function(string $file): string  <option value="...">に入れる値を組み立てる
+ * @return string 最新メジャーバージョンのファイル (基準バージョンのパス)
+ */
+function renderVersionOptions(array $matchingFiles, callable $extractVersion, callable $buildValue) {
+    usort($matchingFiles, function ($a, $b) use ($extractVersion) {
+        $versionA = $extractVersion($a);
+        $versionB = $extractVersion($b);
+
+        return compareSemanticVersions($versionA, $versionB) * (-1);
+    });
+
+    $latestVerPath = '';
+    if (!empty($matchingFiles)) {
+        $prevVer = '';
+        foreach ($matchingFiles as $file) {
+            $bgcolor = '#ffffff';
+            $addSymbol = '';
+            $versionName = $extractVersion($file);
+            $versionMajor = explode('.', $versionName)[0];
+            if (strpos($versionName, '-') !== false) {
+                $bgcolor = '#ffbbbb';
+            } else if ($prevVer !== $versionMajor) {
+                if ($latestVerPath == '') {
+                    $latestVerPath = $file;
+                }
+                if (strpos($versionName, '(final)') !== false) {
+                    $bgcolor = '#eeaaee';
+                } else if (compareSemanticVersions($versionName, '1.0.0') < 0) {
+                    $bgcolor = '#cccccc';
+                } else {
+                    $bgcolor = ($prevVer == '' ? '#bbbbff' : '#dddd99');
+                    $addSymbol = ' *';
+                }
+                $prevVer = $versionMajor;
+            } else if (compareSemanticVersions($versionName, '19.4.1') < 0) {
+                $bgcolor = '#cccccc';
+            }
+            echo '<option value="' . $buildValue($file) . '" style="background-color:' . $bgcolor . ';">v' . $versionName . $addSymbol . '</option>' . "\n";
+        }
+    }
+
+    return $latestVerPath;
+}

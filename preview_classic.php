@@ -1,14 +1,7 @@
 ﻿<?php
 require_once __DIR__ . '/common.php';
 
-$rootDir = '';
-if ($_SERVER['HTTP_HOST'] === 'danonicw.skr.jp') {
-	$rootDir = '/home/cw7/www/danonicw';
-    $rootUrl = 'https://danonicw.skr.jp/';
-} else if ($_SERVER['HTTP_HOST'] === 'tickle.cloudfree.jp') {
-	$rootDir = '/home/tickle/tickle.cloudfree.jp/public_html';
-    $rootUrl = 'https://tickle.cloudfree.jp/';
-}
+[$rootDir, $rootUrl] = resolveRootPaths();
 
 ?>
 <!DOCTYPE html>
