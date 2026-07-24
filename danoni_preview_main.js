@@ -197,9 +197,13 @@ const applyServerDataToForm = (_config) => {
 // _config.writeIfMissing:     baseStorageが無くても既定値で書き込むか
 // _config.bootstrapDomainDefault: storageOrgが無い場合に urlDomain/ 側にも既定値を書き込むか
 // _config.roundAdjustment:    function(adj): number  adjustment値の丸め処理
+// _config.urlDomain:          呼び出し元の urlDomain (この関数はトップレベル関数のため、
+//                              呼び出し元のローカル変数を暗黙に参照できない。必ず渡すこと)
 //
 // 戻り値: { storageOrg, baseStorage }
 const applyLocalStorageDefaults = (_config) => {
+    const urlDomain = _config.urlDomain;
+
     // 作品別のローカルストレージデータを必要最低限に設定
     // (クリーンアップより前に読み取る必要がある。クリーンアップの除外対象に
     //  baseUrlキー自体は含まれないため、先に消してしまうと前回値を読めなくなる)
@@ -305,6 +309,12 @@ const initDanoniPreview = (config) => {
 
         applyVersionLinks(vElements[0]);
     }
+
+    // danoni.js が baseVersion をグローバル変数として
+    // 直接参照するため、window に公開しておく必要がある
+    // (このファイルを initDanoniPreview 関数でラップした際、baseVersion がこの関数内の
+    //  ローカル変数になってしまい、外部から参照できなくなっていたための対応)
+    window.baseVersion = baseVersion;
 
     if (versionj === 0) {
         document.getElementById(`new`).style.color = `#999999`;
@@ -618,6 +628,7 @@ const initDanoniPreview = (config) => {
     });
 
     applyLocalStorageDefaults({
+        urlDomain,
         useCurrentFallback: true,
         writeIfMissing: true,
         bootstrapDomainDefault: true,
