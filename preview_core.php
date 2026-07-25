@@ -18,7 +18,11 @@ require_once __DIR__ . '/common.php';
 $getParamPath = '';
 if ($previewConfig['type'] === 'cdn') {
 	if (isset($_GET["v"])) {
-		$testPath = $previewConfig['cdnBaseUrl']."@".$_GET["v"]."/js/danoni_main.js";
+		// index.php ("v49.3.1"のようなv付き表記) との統一感のため、
+		// CDN版では "v49.3.1" / "49.3.1" のどちらの表記でも受け付ける。
+		// npm/CDN側のバージョンタグにはv接頭辞が付かないため、内部的には常に取り除く。
+		$versionParam = preg_replace('/^[vV](?=\d)/', '', $_GET["v"]);
+		$testPath = $previewConfig['cdnBaseUrl']."@".$versionParam."/js/danoni_main.js";
 		$getParamPath = $testPath;
 	}
 } else {
@@ -111,9 +115,14 @@ const serverData = <?php echo json_encode(buildServerData(
     $rootDir,
     $rootUrl,
     [
-        'selected' => $previewConfig['type'] === 'cdn'
-            ? (($_POST['v'] ?? '') !== '' ? $_POST['v'] : ($_GET['v'] ?? ''))
-            : ($_POST['v'] ?? ''),
+        // 'selected' は POST再送信時 (gameMode変更等でフォームが自動送信された場合) の
+        // バージョン維持にのみ使う。GET (?v=) 経由の初回アクセス時は 'param' 側
+        // ($getParamPath、上の GET パラメータ解決処理で作られる正しい形式の値) が
+        // 使われるため、ここで $_GET['v'] にフォールバックしてはいけない。
+        // (CDN版の <option value="..."> はURL全体であり、$_GET['v'] の生のバージョン
+        //  文字列とは一致しないため、ここにフォールバックすると常に不一致になり、
+        //  結果的に常に最新版へフォールバックしてしまうバグになる)
+        'selected' => $_POST['v'] ?? '',
         'param'    => $getParamPath ?? '',
         'latest'   => $latestVerPath ?? '',
         'type'     => $previewConfig['type'],
