@@ -59,6 +59,13 @@ if (matches !== null) {
     baseVersion = matches[1];
     document.getElementById(`cver`).innerHTML = `v${baseVersion}`;
 }
+
+// danoni.js が baseVersion をグローバル変数として
+// 直接参照するため、window に公開しておく必要がある
+// (このファイルはトップレベルのスクリプトなので実質的には既にグローバルだが、
+//  main.js側と同じ書き方・同じコメントにして grep で揃って見つかるようにしている)
+window.baseVersion = baseVersion;
+
 for (let j = 0; j < vElements.length; j++) {
     if (vElements[j].text.split(' ')[0] === "v" + baseVersion) {
         linkVersion = vElements[j].text.split('(').join('-').split(' ').join('-').split('-')[0];
@@ -151,6 +158,7 @@ const dfCxt = evt => true;
 });
 
 const { storageOrg } = applyLocalStorageDefaults({
+    urlDomain,
     useCurrentFallback: false,
     writeIfMissing: false,
     bootstrapDomainDefault: false,
