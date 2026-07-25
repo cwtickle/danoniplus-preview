@@ -1,6 +1,6 @@
 <?php
 /**
- * index.php / index2.php / preview_classic.php で共有するユーティリティ関数群
+ * index.php / jsdelivr.php / preview_classic.php で共有するユーティリティ関数群
  *
  * 各ファイルからは先頭で以下のように読み込む想定:
  *   require_once __DIR__ . '/common.php';
@@ -93,7 +93,7 @@ function compareSemanticVersions($versionA, $versionB) {
 
 /**
  * ホスト名から配置先のルートディレクトリ・ルートURLを判定する
- * (index.php / index2.php / preview_classic.php で共通)
+ * (index.php / jsdelivr.php / preview_classic.php で共通)
  *
  * @return array{0: string, 1: string} [$rootDir, $rootUrl]
  */
@@ -111,11 +111,11 @@ function resolveRootPaths() {
 }
 
 /**
- * バージョン選択用の<option>一覧を出力する (index.php / index2.php で共通)
+ * バージョン選択用の<option>一覧を出力する (index.php / jsdelivr.php で共通)
  *
  * $matchingFiles の並べ替え・背景色判定ロジックは完全に共通だが、
  * バージョン文字列の取り出し方・<option value="...">の組み立て方が
- * ローカル版(index.php)とCDN版(index2.php)とで異なるため、
+ * ローカル版(index.php)とCDN版(jsdelivr.php)とで異なるため、
  * それぞれをコールバックとして受け取る。
  *
  * @param array $matchingFiles ソート前のファイル一覧 (ローカルパス、またはCDN版はバージョン文字列そのもの)
@@ -166,7 +166,7 @@ function renderVersionOptions(array $matchingFiles, callable $extractVersion, ca
 
 /**
  * アップロードされたファイルを処理し、$rootDir/tmp/ 以下へ保存する。
- * (index.php / index2.php / preview_classic.php で共通)
+ * (index.php / jsdelivr.php / preview_classic.php で共通)
  *
  * $_POST への表示用ファイル名 (mf, dosf1, htmlf1, jf1〜3, cf1〜2, imgs, prejs) の
  * 反映も行う (副作用として $_POST を直接書き換える。既存の呼び出し元の挙動を踏襲)。

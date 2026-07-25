@@ -1,24 +1,24 @@
 <?php
 require_once __DIR__ . '/common.php';
 
-// このファイルは index.php / index2.php から $previewConfig を設定した上で
+// このファイルは index.php / jsdelivr.php から $previewConfig を設定した上で
 // require されることを前提とする。単体では直接アクセスしない。
 // 期待する $previewConfig の形:
 // [
 //     'type'                => 'local' | 'cdn',
 //     'titleSuffix'          => '' や ' (jsdelivr)' など <title> に付け足す文字列,
-//     'indexLinkHref'        => タイトル部の "Index" リンク先 ('./' 等),
-//     'formAction'           => <form action="..."> に入れる値,
-//     'baseAction'           => JS(initDanoniPreview)に渡す遷移先ベースURL,
+//     'baseAction'           => タイトル部の "Index" リンク先 / <form action="..."> / JS(initDanoniPreview)に渡す遷移先ベースURL (すべて同一の値),
 //     'templateFile'         => ダウンロード時のデフォルトテンプレートファイル名,
 //     'noSoundPath'          => 楽曲未指定時の音源パス (JS用),
 //     'supportsOldVersions'  => v19.4.0未満のバージョンをサポートするか (JS用),
+//     'cdnBaseUrl'           => CDN版の場合のパッケージ配信元ベースURL (例: 'https://cdn.jsdelivr.net/npm/danoniplus')
+//                               ローカル版では未使用。unpkg等、別CDN版を今後追加する際はこの値だけ変えればよい。
 // ]
 
 $getParamPath = '';
 if ($previewConfig['type'] === 'cdn') {
 	if (isset($_GET["v"])) {
-		$testPath = "https://cdn.jsdelivr.net/npm/danoniplus@".$_GET["v"]."/js/danoni_main.js";
+		$testPath = $previewConfig['cdnBaseUrl']."@".$_GET["v"]."/js/danoni_main.js";
 		$getParamPath = $testPath;
 	}
 } else {
@@ -128,7 +128,7 @@ const serverData = <?php echo json_encode(buildServerData(
         <tr>
             <td>
                 <p style="text-align:center;">
-                    <span class="title"><span class="title1">D</span>ancing☆<span class="title2">O</span>nigiri <span class="title3">P</span>review (<a href="<?php echo $previewConfig['indexLinkHref']; ?>" onclick="return confirm('Data will be reset. Is it OK?\nデータはリセットされます。よろしいですか？');">Index</a>)</span>
+                    <span class="title"><span class="title1">D</span>ancing☆<span class="title2">O</span>nigiri <span class="title3">P</span>review (<a href="<?php echo $previewConfig['baseAction']; ?>" onclick="return confirm('Data will be reset. Is it OK?\nデータはリセットされます。よろしいですか？');">Index</a>)</span>
                     <span class="ver"><a id="newh" href="javascript:jumpPrev();">▲</a><span id="cver"></span><a href="javascript:jumpNext();">▼</a></span><br>
                 </p>
                 <hr>
@@ -149,7 +149,7 @@ const serverData = <?php echo json_encode(buildServerData(
                     <a href="https://github.com/cwtickle/danoniplus/wiki/HowToUsePreview" target="wiki">プレビューサイトの使い方</a> (<a href="https://github.com/cwtickle/danoniplus-docs/wiki/HowToUsePreview" target="wiki">How to Use</a>)
                 </p>
                 <hr>
-                <form method="post" action="<?php echo $previewConfig['formAction']; ?>" id="formV" name="formV" style="text-align:center;" enctype="multipart/form-data">
+                <form method="post" action="<?php echo $previewConfig['baseAction']; ?>" id="formV" name="formV" style="text-align:center;" enctype="multipart/form-data">
                     <input type="submit" value="譜面読込 (Send)" style="width:50%;font-size:20px;">
                     <button type="button" id="loadButton" style="width:35%;font-size:20px;">Download As File</button>
                     <table style="width:100%;text-align:left;border:1px solid #999999;">
@@ -176,8 +176,8 @@ const serverData = <?php echo json_encode(buildServerData(
                                         function ($file) {
                                             return $file;
                                         },
-                                        function ($file) {
-                                            return 'https://cdn.jsdelivr.net/npm/danoniplus@' . $file . '/js/danoni_main.js';
+                                        function ($file) use ($previewConfig) {
+                                            return $previewConfig['cdnBaseUrl'] . '@' . $file . '/js/danoni_main.js';
                                         }
                                     );
                                 } else {

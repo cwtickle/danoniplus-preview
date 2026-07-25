@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 /**
- * index.php / index2.php / preview_classic.php で共有するスタイル定義
+ * index.php / jsdelivr.php / preview_classic.php で共有するスタイル定義
  * (3ファイルで内容が完全に一致していたルールのみ)
  *
  * 各ファイル固有のルール（a:link, テーブル縞模様のセレクタ違い,

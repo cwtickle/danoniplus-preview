@@ -2,8 +2,6 @@
 $previewConfig = [
     'type'                => 'local',
     'titleSuffix'         => '',
-    'indexLinkHref'       => './',
-    'formAction'          => '',
     'baseAction'          => './',
     'templateFile'        => 'template.html',
     'noSoundPath'         => 'nosound.mp3',
