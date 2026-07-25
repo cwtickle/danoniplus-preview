@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/common.php';
 
-// このファイルは index.php / jsdelivr.php から $previewConfig を設定した上で
+// このファイルは index.php / jsdelivr.php / unpkg.php から $previewConfig を設定した上で
 // require されることを前提とする。単体では直接アクセスしない。
 // 期待する $previewConfig の形:
 // [

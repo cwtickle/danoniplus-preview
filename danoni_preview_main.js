@@ -1,19 +1,19 @@
 ﻿/**
- * index.php (ローカル版) と jsdelivr.php (CDN/jsdelivr版) で共有するメイン処理。
+ * index.php (ローカル版) と jsdelivr.php / unpkg.php (CDN版) で共有するメイン処理。
  *
  * 呼び出し側は先に serverData (各PHPが出力する <script> ブロック) を
  * 定義した上で、このファイル読込後に以下のように呼び出す。
  *
  *   initDanoniPreview({
- *       baseAction: './',                 // フォームの送信先 (jsdelivr.php では './jsdelivr.php')
+ *       baseAction: './',                 // フォームの送信先 (jsdelivr.php では './jsdelivr.php' 等)
  *       supportsOldVersions: true,         // v19.4.0 より前のバージョンをローカルに保持しているか
  *       templateFile: 'template.html',     // ダウンロード時のデフォルトテンプレート
  *       noSoundPath: 'nosound.mp3',        // 楽曲未指定時の音源パス
  *   });
  *
- * config の各項目が、index.php / jsdelivr.php 間で唯一異なっていた挙動に対応します。
+ * config の各項目が、index.php / jsdelivr.php / unpkg.php 間で異なっていた挙動に対応します。
  * それ以外のロジックはバージョン番号による分岐（compareVersions）で
- * 両サイトに対して自然に正しい結果になるよう、共通コードとして統合しています。
+ * 各サイトに対して自然に正しい結果になるよう、共通コードとして統合しています。
  */
 
 // 動的にdanoni_main.jsを読み込む処理 (バージョンにより参照先が異なるため)
@@ -83,7 +83,7 @@ const compareVersions = (versionA, versionB) => {
 
 // serverData.post の値をフォームへ反映し、アップロードされたファイル情報を
 // dos データ・各表示用フィールドへ反映する処理。
-// index.php / jsdelivr.php (initDanoniPreview 経由) と preview_classic.php の
+// index.php / jsdelivr.php / unpkg.php (initDanoniPreview 経由) と preview_classic.php の
 // 両方で構造が完全に共通だったため、パスのプレフィックスだけを _config 経由で
 // 受け取る形にして共通化している。
 //
@@ -189,7 +189,7 @@ const applyServerDataToForm = (_config) => {
 
 // ロケール、キー別、エディター関連以外のローカルストレージデータを消去し、
 // 作品別のローカルストレージ設定値を初期化する。
-// (index.php/jsdelivr.php と preview_classic.php とで、per-URLの前回値への
+// (index.php/jsdelivr.php/unpkg.php と preview_classic.php とで、per-URLの前回値への
 //  フォールバックの有無・storageOrgが無い場合に書き込むかどうか・
 //  adjustmentの丸め方が異なるため、_config で指定する)
 //
