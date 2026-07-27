@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 /**
- * index.php / jsdelivr.php / preview_classic.php で共有するスタイル定義
+ * index.php / index2.php / preview_classic.php で共有するスタイル定義
  * (3ファイルで内容が完全に一致していたルールのみ)
  *
  * 各ファイル固有のルール（a:link, テーブル縞模様のセレクタ違い,
@@ -27,6 +27,12 @@ table {
     border-collapse: collapse;
     width: 80%;
     margin: auto;
+}
+
+@media (max-width: 1100px) {
+    table {
+        width: 100%;
+    }
 }
 
 .title {
@@ -55,7 +61,21 @@ table {
 
 input[type=text]:read-only {
     width: 25%;
-    background-color: #aaaaaa;
+    background-color: #15151f;
+    color: #999999;
+    border: 1px solid #333340;
+    border-radius: 6px;
+    padding: 4px 8px;
+    box-sizing: border-box;
+}
+
+input[type=text] {
+    background-color: #1a1a2e;
+    color: #cccccc;
+    border: 1px solid #444460;
+    border-radius: 6px;
+    padding: 4px 8px;
+    box-sizing: border-box;
 }
 
 textarea {
@@ -76,6 +96,9 @@ a:hover {
 }
 
 .select {
+    background-color: #1a1a2e;
+    color: #cccccc;
+    border: 1px solid #444460;
     border-radius: 5px;
     position: relative;
     font-size: 15px;
@@ -83,12 +106,392 @@ a:hover {
 }
 
 input[type=file] {
-    width: 60%;
-    height: 40px;
-    border: 1px dashed #999999;
+    width: 100%;
+    max-width: 420px;
+    height: auto;
+    background-color: #1a1a2e;
+    color: #cccccc;
+    border: 1px solid #444460;
+    border-radius: 6px;
+    padding: 4px;
+    font-size: 12px;
+    box-sizing: border-box;
 }
 
 input[type=file]:hover {
     cursor: pointer;
-    background: #66666699;
+    background: #262640;
+}
+
+input[type=file]::file-selector-button {
+    background: #BAB7E0;
+    color: #1a1a2e;
+    border: none;
+    border-radius: 5px;
+    padding: 6px 12px;
+    margin-right: 10px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+input[type=file]::file-selector-button:hover {
+    background: #FF9900;
+}
+
+/* ここから下: ヘッダーレイアウト刷新用のスタイル (2026年〜) */
+
+.header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: #0a0a1a;
+    border: 1px solid #333340;
+    border-radius: 10px;
+    padding: 10px 14px;
+    width: 100%;
+    margin: 10px auto;
+    box-sizing: border-box;
+}
+
+.header-title-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    flex-wrap: wrap;
+}
+
+.header-label {
+    color: #999999;
+    font-size: 12px;
+}
+
+.nav-arrow {
+    font-size: 13px;
+}
+
+.select-version {
+    font-size: 13px;
+    max-width: 150px;
+}
+
+/* ツールチップ (補足情報・リンク集をまとめて表示する ? アイコン) */
+
+.tt-wrap {
+    position: relative;
+    display: inline-block;
+}
+
+.tt-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #333350;
+    color: #aaaaaa;
+    font-size: 10px;
+    cursor: help;
+}
+
+.tt-box {
+    display: none;
+    position: absolute;
+    left: 20px;
+    top: 0px;
+    background: #1a1a2e;
+    border: 1px solid #555555;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 11px;
+    white-space: nowrap;
+    font-weight: normal;
+    text-align: left;
+    z-index: 20;
+}
+
+.tt-box a {
+    display: block;
+    margin: 2px 0;
+}
+
+.tt-box-title {
+    left: 0;
+    top: 20px;
+}
+
+.tt-box-wide {
+    width: 400px;
+    white-space: normal;
+}
+
+.tt-box-mini {
+    width: 200px;
+    white-space: normal;
+}
+
+.tt-wrap:hover .tt-box,
+.tt-wrap:focus-within .tt-box {
+    display: block;
+}
+
+/* 譜面データカード */
+
+.chart-card {
+    background: #0a0a1a;
+    border: 1px solid #333340;
+    border-radius: 10px;
+    padding: 14px 16px;
+    width: 100%;
+    margin: 10px auto;
+    box-sizing: border-box;
+}
+
+.chart-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.chart-card-title {
+    font-size: 13px;
+    color: #9999ff;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.chart-card-links {
+    font-size: 13px;
+}
+
+.chart-card-note {
+    color: #888888;
+    font-size: 10px;
+}
+
+.chart-card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-primary,
+.btn-secondary {
+    border-radius: 6px;
+    font-size: 13px;
+    padding: 6px 16px;
+    cursor: pointer;
+    border: 1px solid #BAB7E0;
+}
+
+.btn-primary {
+    background: #BAB7E0;
+    color: #1a1a2e;
+    font-weight: bold;
+}
+
+.btn-primary:hover {
+    background: #eeeeff;
+    color: #1a1a2e;
+    font-weight: bold;
+    transition: background-color 0.5s ease;
+}
+
+.btn-secondary {
+    background: #1a1a2e;
+    color: #BAB7E0;
+    transition: background-color 0.5s ease;
+}
+
+.btn-secondary:hover {
+    background: #444477;
+    color: #BAB7E0;
+}
+
+.chart-textarea {
+    width: 100%;
+    height: 120px;
+    background: #000000;
+    border: 1px solid #333340;
+    border-radius: 6px;
+    color: #cccccc;
+    font-size: 13px;
+    box-sizing: border-box;
+    padding: 8px;
+    resize: vertical;
+}
+
+/* その他設定カード: 2ペインレイアウト (ファイルアップロード 7 : 表示設定+その他 3) */
+
+.settings-panes {
+    display: flex;
+    gap: 14px;
+    width: 100%;
+    margin: 10px auto;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.settings-pane-left {
+    flex: 7 1 320px;
+}
+
+.settings-pane-right {
+    flex: 3 1 220px;
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-card {
+    background: #0a0a1a;
+    border: 1px solid #333340;
+    border-radius: 10px;
+    padding: 12px 16px;
+    width: 100%;
+    margin: 0 0 14px 0;
+    box-sizing: border-box;
+}
+
+.settings-pane-right .settings-card:last-child,
+.settings-pane-left .settings-card:last-child {
+    margin-bottom: 0;
+}
+
+.settings-card-title {
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    text-align: left;
+}
+
+.settings-card-title-1 {
+    color: #9999ff;
+}
+
+.settings-card-title-2 {
+    color: #ff9999;
+}
+
+.settings-card-title-3 {
+    color: #ffff99;
+}
+
+.settings-table {
+    width: 100%;
+    text-align: left;
+    border: none;
+}
+
+.settings-table tr:nth-child(2n) {
+    background: none;
+}
+
+.settings-table td {
+    padding: 8px 6px;
+    vertical-align: top;
+    font-size: 12px;
+}
+
+.settings-table td:first-child {
+    width: 26%;
+    color: #cccccc;
+}
+
+.settings-table a {
+    font-size: 12px;
+}
+
+/* Reset / DL Template 等の小さな操作リンクをピル型バッジに */
+
+.pill-link {
+    display: inline-block;
+    background: #1a1a2e;
+    border: 1px solid #444460;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 11px;
+    color: #BAB7E0 !important;
+    text-decoration: none !important;
+}
+
+.pill-link:hover {
+    background: #262640;
+    color: #FF9900 !important;
+}
+
+/* 幅/高さ選択のうち、高さ側だけをやや強調する差し色 (ダークテーマ向け) */
+
+.select-accent {
+    border-color: #4a9999;
+    box-shadow: inset 3px 0 0 #4a9999;
+}
+
+/* Advanced / Experiment Settings のアコーディオン */
+
+.accordion-card {
+    width: 100%;
+    margin: 14px auto;
+    border: 1px solid #333340;
+    border-radius: 10px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.accordion-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    text-align: left;
+    background: #0a0a1a;
+    color: #BAB7E0;
+    border: none;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: bold;
+    font-family: inherit;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.accordion-toggle:hover {
+    background: #14142a;
+}
+
+.accordion-icon {
+    font-size: 9px;
+    display: inline-block;
+    transition: transform 0.15s ease;
+}
+
+.accordion-toggle[aria-expanded="true"] .accordion-icon {
+    transform: rotate(90deg);
+}
+
+.accordion-body {
+    padding: 12px 16px;
+    background: #050510;
+}
+
+.accordion-warning .accordion-toggle {
+    color: #ff9999;
+}
+
+.accordion-warning .accordion-body {
+    background: #100505;
 }

@@ -135,29 +135,35 @@ function renderVersionOptions(array $matchingFiles, callable $extractVersion, ca
     if (!empty($matchingFiles)) {
         $prevVer = '';
         foreach ($matchingFiles as $file) {
-            $bgcolor = '#ffffff';
+            $bgcolor = '#1a1a2e';
+            $fgcolor = '#cccccc';
             $addSymbol = '';
             $versionName = $extractVersion($file);
             $versionMajor = explode('.', $versionName)[0];
             if (strpos($versionName, '-') !== false) {
-                $bgcolor = '#ffbbbb';
+                $bgcolor = '#4a2020';
+                $fgcolor = '#ffaaaa';
             } else if ($prevVer !== $versionMajor) {
                 if ($latestVerPath == '') {
                     $latestVerPath = $file;
                 }
                 if (strpos($versionName, '(final)') !== false) {
-                    $bgcolor = '#eeaaee';
+                    $bgcolor = '#3a2040';
+                    $fgcolor = '#eeaaee';
                 } else if (compareSemanticVersions($versionName, '1.0.0') < 0) {
-                    $bgcolor = '#cccccc';
+                    $bgcolor = '#2a2a30';
+                    $fgcolor = '#999999';
                 } else {
-                    $bgcolor = ($prevVer == '' ? '#bbbbff' : '#dddd99');
+                    $bgcolor = ($prevVer == '' ? '#20204a' : '#4a4a20');
+                    $fgcolor = ($prevVer == '' ? '#bbbbff' : '#dddd99');
                     $addSymbol = ' *';
                 }
                 $prevVer = $versionMajor;
             } else if (compareSemanticVersions($versionName, '19.4.1') < 0) {
-                $bgcolor = '#cccccc';
+                $bgcolor = '#2a2a30';
+                $fgcolor = '#999999';
             }
-            echo '<option value="' . $buildValue($file) . '" style="background-color:' . $bgcolor . ';">v' . $versionName . $addSymbol . '</option>' . "\n";
+            echo '<option value="' . $buildValue($file) . '" style="background-color:' . $bgcolor . ';color:' . $fgcolor . ';">v' . $versionName . $addSymbol . '</option>' . "\n";
         }
     }
 

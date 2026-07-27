@@ -15,6 +15,7 @@ require_once __DIR__ . '/common.php';
 //                               ローカル版では未使用。unpkg等、別CDN版を今後追加する際はこの値だけ変えればよい。
 // ]
 
+$updateTimestamp = '2026-07-27_210500';
 $getParamPath = '';
 if ($previewConfig['type'] === 'cdn') {
 	if (isset($_GET["v"])) {
@@ -72,7 +73,7 @@ if ($previewConfig['type'] === 'cdn') {
 
     <title>Dancing☆Onigiri Preview<?php echo $previewConfig['titleSuffix']; ?></title>
 
-    <link rel="stylesheet" href="./danoni_preview_common.css">
+    <link rel="stylesheet" href="./danoni_preview_common.css?<?php echo $updateTimestamp; ?>">
     <style type="text/css">
     th,
     td {
@@ -81,18 +82,6 @@ if ($previewConfig['type'] === 'cdn') {
 
     tr:nth-child(2n) {
         background: #333333;
-    }
-
-    .advanced {
-        background: #000033;
-        border: solid 1px #cccccc;
-        text-align: center;
-    }
-
-    .warning {
-        background: #330000;
-        border: solid 1px #cccccc;
-        text-align: center;
     }
     </style>
 <?php
@@ -136,11 +125,91 @@ const serverData = <?php echo json_encode(buildServerData(
     <table>
         <tr>
             <td>
-                <p style="text-align:center;">
-                    <span class="title"><span class="title1">D</span>ancing☆<span class="title2">O</span>nigiri <span class="title3">P</span>review (<a href="<?php echo $previewConfig['baseAction']; ?>" onclick="return confirm('Data will be reset. Is it OK?\nデータはリセットされます。よろしいですか？');">Index</a>)</span>
-                    <span class="ver"><a id="newh" href="javascript:jumpPrev();">▲</a><span id="cver"></span><a href="javascript:jumpNext();">▼</a></span><br>
-                </p>
-                <hr>
+                <form method="post" action="<?php echo $previewConfig['baseAction']; ?>" id="formV" name="formV" style="text-align:center;" enctype="multipart/form-data">
+                <div class="header-bar">
+                    <div class="header-title-group">
+                        <span class="tt-wrap">
+                            <span class="tt-icon" tabindex="0">?</span>
+                            <span class="tt-box tt-box-title">
+                                <a href="https://github.com/cwtickle/danoniplus/wiki/HowToUsePreview" target="wiki">プレビューサイトの使い方</a>
+                                <a href="https://github.com/cwtickle/danoniplus-docs/wiki/HowToUsePreview" target="wiki">How to Use</a>
+                            </span>
+                        </span>
+                        <span class="title">
+                            <a href="<?php echo $previewConfig['baseAction']; ?>" onclick="return confirm('Data will be reset. Is it OK?\nデータはリセットされます。よろしいですか？');">
+                                <span class="title1">D</span>ancing☆<span class="title2">O</span>nigiri <span class="title3">P</span>review
+                            </a>
+                        </span>
+                    </div>
+                    <div class="header-controls">
+                        <span id="modett" class="tt-wrap">
+                            <span class="tt-icon" tabindex="0">?</span>
+                            <span class="tt-box tt-box-title">
+                                <a id="srcjs" target="src">js</a>
+                                <a id="srccss" target="src">css</a>
+                            </span>
+                        </span>
+                        <span id="modeLbl" class="header-label">Mode</span>
+                        <span id="ck">
+                            <select class="select" name="g" id="g" onchange="getWidth(this);">
+                                <option value="">Dancing☆Onigiri</option>
+                                <option value="9tkey">Dancing☆Onigiri (9tkey)</option>
+                                <option value="kstyle">Kirizma / キリズマ</option>
+                                <option value="pstyle">Punching◇Panels (Single)</option>
+                                <option value="pstyle_dp">Punching◇Panels (Double)</option>
+                            </select>
+                        </span>
+
+                        <span class="tt-wrap">
+                            <span class="tt-icon" tabindex="0">?</span>
+                            <span class="tt-box tt-box-title">
+                                <a id="versionLink" target="release">Release</a>
+                                <a id="changelog" target="changelog">Changelog</a>
+                                <a id="updateInfo" target="updateInfo">UpdateInfo</a>
+                            </span>
+                        </span>
+                        <span class="header-label">Ver</span>
+                        <a id="newh" href="javascript:jumpPrev();" class="nav-arrow">▲</a>
+                        <span id="cver" style="display:none;"></span>
+                        <select class="select select-version" name="v" id="v" onchange="getVersion(this);">
+                            <?php
+                            if ($previewConfig['type'] === 'cdn') {
+                                $matchingFiles = [];
+                                $tmpFile = @fopen('npmversion.txt', 'r');
+
+                                if ($tmpFile) {
+                                    while (($line = fgets($tmpFile)) !== false) {
+                                        $matchingFiles[] = str_replace("\n", "", $line);
+                                    }
+                                    fclose($tmpFile);
+                                }
+
+                                $latestVerPath = renderVersionOptions(
+                                    $matchingFiles,
+                                    function ($file) {
+                                        return $file;
+                                    },
+                                    function ($file) use ($previewConfig) {
+                                        return $previewConfig['cdnBaseUrl'] . '@' . $file . '/js/danoni_main.js';
+                                    }
+                                );
+                            } else {
+                                $matchingFiles = findFilesMatchingPattern();
+                                $latestVerPath = renderVersionOptions(
+                                    $matchingFiles,
+                                    function ($file) {
+                                        return extractVersionFromFilename($file);
+                                    },
+                                    function ($file) {
+                                        return $file;
+                                    }
+                                );
+                            }
+                            ?>
+                        </select>
+                        <a href="javascript:jumpNext();" class="nav-arrow">▼</a>
+                    </div>
+                </div>
 
                 <input type="hidden" name="dos" id="dos">
                 <input type="hidden" name="externalDos" id="externalDos">
@@ -152,214 +221,284 @@ const serverData = <?php echo json_encode(buildServerData(
                     <p>Preparing game...</p>
                     <p>If this message does not disappear forever, please use a browser that supports HTML5, such as Google Chrome or Firefox. </p>
                 </div>
-                <hr>
-                <p style="text-align:center;">
-                    <a href="https://superkuppabros.github.io/danoni-editor/" target="_blank">Dancing☆Onigiri エディター</a> (<a id="editorsub" onclick="window.open('https://superkuppabros.github.io/danoni-editor/', '_blank', 'width=800px,height=500px');return false;">Window</a> / <a href="./editor/" target="_blank">Mirror</a>) ／
-                    <a href="https://github.com/cwtickle/danoniplus/wiki/HowToUsePreview" target="wiki">プレビューサイトの使い方</a> (<a href="https://github.com/cwtickle/danoniplus-docs/wiki/HowToUsePreview" target="wiki">How to Use</a>)
-                </p>
-                <hr>
-                <form method="post" action="<?php echo $previewConfig['baseAction']; ?>" id="formV" name="formV" style="text-align:center;" enctype="multipart/form-data">
-                    <input type="submit" value="譜面読込 (Send)" style="width:50%;font-size:20px;">
-                    <button type="button" id="loadButton" style="width:35%;font-size:20px;">Download As File</button>
-                    <table style="width:100%;text-align:left;border:1px solid #999999;">
-                        <tr>
-                            <td style="width:24%;">
-                                Version<br><a id="new" href="javascript:jumpPrev();">▲New</a> |<a href="javascript:jumpNext();">▼Old</a>
-                            </td>
-                            <td>
-                                <select class="select" name="v" id="v" onchange="getVersion(this);">
-                                    <?php
-                                if ($previewConfig['type'] === 'cdn') {
-                                    $matchingFiles = [];
-                                    $tmpFile = @fopen('npmversion.txt', 'r');
 
-                                    if ($tmpFile) {
-                                        while (($line = fgets($tmpFile)) !== false) {
-                                            $matchingFiles[] = str_replace("\n", "", $line);
-                                        }
-                                        fclose($tmpFile);
-                                    }
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <span class="chart-card-title">
+                            譜面データ
+                            <span class="tt-wrap">
+                                <span class="tt-icon" tabindex="0">?</span>
+                                <span class="tt-box tt-box-wide">
+                                    Input your chart data. Paste the data output from the editor or chart settings here.<br>
+                                    エディターで出力した譜面データや譜面ヘッダーを貼り付けてください
+                                </span>
+                            </span>
+                        </span>
+                        <span class="chart-card-links">
+                            <span id="editorDefault">
+                                <a href="https://superkuppabros.github.io/danoni-editor/" target="_blank">Dancing☆Onigiri エディター</a>
+                                (<a id="editorsub" onclick="window.open('https://superkuppabros.github.io/danoni-editor/', '_blank', 'width=800px,height=500px');return false;">Window</a> / 
+                                <a href="./editor/" target="_blank">Mirror</a>) ↗
+                            </span>
+                            <a id="editorLink" target="editor">Editor</a>
+                        </span>
+                        <span class="chart-card-actions">
+                            <input type="submit" value="譜面読込 (Load)" class="btn-primary">
+                            <button type="button" id="loadButton" class="btn-secondary">Download As File</button>
+                        </span>
+                    </div>
+                    <textarea id="d" name="d" class="chart-textarea"></textarea>
+                </div>
 
-                                    $latestVerPath = renderVersionOptions(
-                                        $matchingFiles,
-                                        function ($file) {
-                                            return $file;
-                                        },
-                                        function ($file) use ($previewConfig) {
-                                            return $previewConfig['cdnBaseUrl'] . '@' . $file . '/js/danoni_main.js';
-                                        }
-                                    );
-                                } else {
-                                    $matchingFiles = findFilesMatchingPattern();
-                                    $latestVerPath = renderVersionOptions(
-                                        $matchingFiles,
-                                        function ($file) {
-                                            return extractVersionFromFilename($file);
-                                        },
-                                        function ($file) {
-                                            return $file;
-                                        }
-                                    );
-                                }
-                                ?>
-                                </select><select class="select" name="w" id="w" onchange="getWidth(this);">
-                                    <option value="500px">W: 500px</option>
-                                    <option value="550px">W: 550px</option>
-                                    <option value="600px">W: 600px</option>
-                                    <option value="650px">W: 650px</option>
-                                    <option value="700px">W: 700px</option>
-                                    <option value="750px">W: 750px</option>
-                                    <option value="800px">W: 800px</option>
-                                    <option value="850px">W: 850px</option>
-                                    <option value="900px">W: 900px</option>
-                                    <option value="950px">W: 950px</option>
-                                    <option value="1000px">W: 1000px</option>
-                                    <option value="1050px">W: 1050px</option>
-                                    <option value="1100px">W: 1100px</option>
-                                </select><select class="select" name="h" id="h" onchange="getWidth(this);" style="background: #ccffff;">
-                                    <option value="450px">H: 450px</option>
-                                    <option value="475px">H: 475px</option>
-                                    <option value="500px">H: 500px</option>
-                                    <option value="525px">H: 525px</option>
-                                    <option value="550px">H: 550px</option>
-                                    <option value="575px">H: 575px</option>
-                                    <option value="600px">H: 600px</option>
-                                    <option value="625px">H: 625px</option>
-                                    <option value="650px">H: 650px</option>
-                                    <option value="675px">H: 675px</option>
-                                    <option value="700px">H: 700px</option>
-                                </select>
-                                [<a id="versionLink" target="release"> Release </a> / <a id="changelog" target="changelog"> Changelog </a> / <a id="updateInfo" target="updateInfo"> UpdateInfo </a>]
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Game mode <span id="ck">[ <a id="srcjs" target="src">js</a> <a id="srccss" target="src">/ css</a> ]</span></td>
-                            <td>
-                                <select class="select" name="g" id="g" onchange="getWidth(this);">
-                                    <option value="">Dancing☆Onigiri</option>
-                                    <option value="9tkey">Dancing☆Onigiri (9tkey)</option>
-                                    <option value="kstyle">Kirizma / キリズマ</option>
-                                    <option value="pstyle">Punching◇Panels (Single)</option>
-                                    <option value="pstyle_dp">Punching◇Panels (Double)</option>
-                                </select>
-                                <a id="editorLink" target="editor">Editor</a>
-                                (Valid for v31.3.1 or later)
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                                Input your chart data. Paste the data output from the editor or chart settings here.<br>
-                                譜面データを入力 ( エディターで出力したデータや譜面ヘッダーを貼り付けてください )<br>
-                                <textarea id="d" name="d"></textarea><br>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Keymode(difData)<br>キー数情報</td>
-                            <td>
-                                <input type="text" name="k" id="k" title="If you specify keymode here, you can omit the chart settings information to start.&#13;&#10;ここでキー数を指定すると、譜面ヘッダー情報を省略して起動することができます。">
-                                <a onclick="cancelFile(`k`);">Cancel</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Music File<br>楽曲ファイル</td>
-                            <td>
-                                <input type="file" id="musicFile" name="musicFile" accept=".mp3,.mp4,.m4a,.ogg,.oga,.aac,.flac,.js"> <a onclick="cancelFile(`musicFile`);">Cancel</a> (Max 64MB)<br>
-                                Uploaded: <input type="text" name="mf" id="mf" style="width:75%" readonly>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Chart File<br>譜面ファイル<br>( <a onclick="confirmCancelFile(`dosf1`);">Reset</a> )</td>
-                            <td>
-                                <input type="file" id="dosFile1" name="dosFile1" accept=".js,.txt"> <a onclick="cancelFile(`dosFile1`);">Cancel</a><br>
-                                Charset : <select class="select" name="dosM" id="dosM">
-                                    <option value="UTF-8">UTF-8</option>
-                                    <option value="SHIFT_JIS">SHIFT_JIS</option>
-                                </select> |
-                                Uploaded: <input type="text" name="dosf1" id="dosf1" readonly><br>
-                                <input type="hidden" name="dosf" id="dosf">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>URL Query Parameters<br>( <a onclick="confirmCancelFile(`queryParams`);">Reset</a> )</td>
-                            <td>
-                                <input type="text" name="queryParams" id="queryParams" style="width:75%" title="Specify URL query parameters. Example: scoreId=2&dos=001&#13;&#10;URLクエリパラメーターを指定します。例: scoreId=2&dos=001">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>HTML Template<br>( <a onclick="confirmCancelFile(`htmlf1`, `htmlf`);">Reset</a> )<br>( <a href="<?php echo $previewConfig['templateFile']; ?>" download>DL Template</a> )</td>
-                            <td>
-                                <input type="file" id="htmlFile" name="htmlFile" accept=".html,.htm"> <a onclick="cancelFile(`htmlFile`);">Cancel</a><br>
-                                Uploaded: <input type="text" name="htmlf1" id="htmlf1" readonly><br>
-                                <input type="hidden" name="htmlf" id="htmlf">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" class="advanced">▼ Advanced Settings / 上級者向け設定 ▼</td>
-                        </tr>
-                        <tr>
-                            <td>Custom JS Files<br>( <a onclick="confirmCancelFile(`jf1`, `jf2`, `jf3`, `jf`);">Reset</a> )</td>
-                            <td>
-                                <input type="file" id="jsFile1" name="jsFile1" accept=".js" title="Upload custom JS, common configuration files, and JS files for themes.&#13;&#10;カスタムJSや共通設定ファイル、スキン用JSファイルをアップロードできます。"> <a onclick="cancelFile(`jsFile1`);">Cancel</a><br>
-                                <input type="file" id="jsFile2" name="jsFile2" accept=".js"> <a onclick="cancelFile(`jsFile2`);">Cancel</a><br>
-                                <input type="file" id="jsFile3" name="jsFile3" accept=".js"> <a onclick="cancelFile(`jsFile3`);">Cancel</a><br>
-                                Uploaded: <input type="text" name="jf1" id="jf1" readonly><input type="text" name="jf2" id="jf2" readonly><input type="text" name="jf3" id="jf3" readonly><br>
-                                <input type="hidden" name="jf" id="jf">
-                                <input type="hidden" name="time" id="time">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Custom CSS Files<br>( <a onclick="confirmCancelFile(`cf1`, `cf2`, `cf`);">Reset</a> )</td>
-                            <td>
-                                <input type="file" id="cssFile1" name="cssFile1" accept=".css" title="Upload custom CSS, and CSS files for themes.&#13;&#10;カスタムCSSやスキン用CSSファイルをアップロードできます。"> <a onclick="cancelFile(`cssFile1`);">Cancel</a><br>
-                                <input type="file" id="cssFile2" name="cssFile2" accept=".css"> <a onclick="cancelFile(`cssFile2`);">Cancel</a><br>
-                                Uploaded: <input type="text" name="cf1" id="cf1" readonly><input type="text" name="cf2" id="cf2" readonly><br>
-                                <input type="hidden" name="cf" id="cf">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Image Files<br>( <a onclick="confirmCancelFile(`imgs`, `imgf`);">Reset</a> )</td>
-                            <td>
-                                <input type="file" id="imgFiles" name="imgFiles[]" accept=".png,.jpg,.jpeg,.gif,.svg,.webp" title="Upload a set of image files to be specified for backgrounds, masks, etc.&#13;&#10;背景やマスク等で指定する画像ファイル一式をアップロードします。" multiple> <a onclick="cancelFile(`imgFiles`);">Cancel</a><br>
-                                Uploaded: <input type="text" name="imgs" id="imgs" style="width:75%" readonly><br>
-                                <input type="hidden" name="imgf" id="imgf">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" class="warning">▼ Experiment Settings / 注意を要する設定 ▼</td>
-                        </tr>
-                        <tr>
-                            <td>Preload Values<br>( <a onclick="confirmCancelFile(`prevals`);">Reset</a> )</td>
-                            <td>
-                                <input type="text" name="prevals" id="prevals" style="width:75%" title="Specify the names to be pre-defined in the hidden attribute, separated by commas.&#13;&#10;事前にhidden属性で定義する名前をカンマ区切りで指定します。">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Preload JS Files<br>( <a onclick="confirmCancelFile(`prejs`, `prejf`);">Reset</a> )</td>
-                            <td>
-                                <input type="file" id="prejsFiles" name="prejsFiles[]" accept=".js" title="Upload a batch of js files to be loaded before danoni_main.js.&#13;&#10;danoni_main.jsより前にロードするjsファイルをまとめてアップロードします。" multiple> <a onclick="cancelFile(`prejsFiles`);">Cancel</a><br>
-                                Uploaded: <input type="text" name="prejs" id="prejs" style="width:75%" readonly><br>
-                                <input type="hidden" name="prejf" id="prejf">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Experiment script</td>
-                            <td>
-                                <select class="select" name="cjd" id="cjd" title="Enable/disable experimental scripts with new features.&#13;&#10;新しい機能を実験的に搭載したスクリプトを有効にするかどうかを設定します。">
-                                    <option value="">--------</option>
-                                    <?php
-										$dfJsList = glob('./tmp/script/*.js');
-										foreach($dfJsList as $key => $value) {
-											echo '<option value="'.$value.'">'.basename($value).'</option>'."\n";
-										}
-									?>
-                                </select>
-                            </td>
-                        </tr>
-                    </table>
+                    <div class="settings-panes">
+                        <div class="settings-pane-left">
+                            <div class="settings-card">
+                                <div class="settings-card-title settings-card-title-2">ファイルアップロード</div>
+                                <table class="settings-table">
+                                    <tr>
+                                        <td>Music File<br>楽曲ファイル
+                                            <span class="tt-wrap">
+                                                <span class="tt-icon" tabindex="0">?</span>
+                                                <span class="tt-box tt-box-mini">
+                                                    You can upload files up to 64 MB in size.<br>
+                                                    64MBまでのファイルがアップロード可能です。
+                                                </span>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <input type="file" id="musicFile" name="musicFile" accept=".mp3,.mp4,.m4a,.ogg,.oga,.aac,.flac,.js"> <a onclick="cancelFile(`musicFile`);">Cancel</a><br>
+                                            Uploaded: <input type="text" name="mf" id="mf" style="width:75%" readonly>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Chart File<br>譜面ファイル<br><a class="pill-link" onclick="confirmCancelFile(`dosf1`);">Reset</a></td>
+                                        <td>
+                                            <input type="file" id="dosFile1" name="dosFile1" accept=".js,.txt"> <a onclick="cancelFile(`dosFile1`);">Cancel</a><br>
+                                            Charset : <select class="select" name="dosM" id="dosM">
+                                                <option value="UTF-8">UTF-8</option>
+                                                <option value="SHIFT_JIS">SHIFT_JIS</option>
+                                            </select> |
+                                            Uploaded: <input type="text" name="dosf1" id="dosf1" readonly><br>
+                                            <input type="hidden" name="dosf" id="dosf">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>HTML Template<br><a class="pill-link" onclick="confirmCancelFile(`htmlf1`, `htmlf`);">Reset</a> <a class="pill-link" href="<?php echo $previewConfig['templateFile']; ?>" download>DL Template</a></td>
+                                        <td>
+                                            <input type="file" id="htmlFile" name="htmlFile" accept=".html,.htm"> <a onclick="cancelFile(`htmlFile`);">Cancel</a><br>
+                                            Uploaded: <input type="text" name="htmlf1" id="htmlf1" readonly><br>
+                                            <input type="hidden" name="htmlf" id="htmlf">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Image Files
+                                            <span class="tt-wrap">
+                                                <span class="tt-icon" tabindex="0">?</span>
+                                                <span class="tt-box tt-box-wide">
+                                                    Upload a set of image files to be specified for backgrounds, masks, etc.<br>
+                                                    背景やマスク等で指定する画像ファイル一式をアップロードします。
+                                                </span>
+                                            </span>
+                                            <br><a class="pill-link" onclick="confirmCancelFile(`imgs`, `imgf`);">Reset</a></td>
+                                        <td>
+                                            <input type="file" id="imgFiles" name="imgFiles[]" accept=".png,.jpg,.jpeg,.gif,.svg,.webp" multiple> <a onclick="cancelFile(`imgFiles`);">Cancel</a><br>
+                                            Uploaded: <input type="text" name="imgs" id="imgs" style="width:75%" readonly><br>
+                                            <input type="hidden" name="imgf" id="imgf">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="settings-pane-right">
+                            <div class="settings-card">
+                                <div class="settings-card-title settings-card-title-1">表示設定</div>
+                                <table class="settings-table">
+                                    <tr>
+                                        <td style="width:24%;">Display Size<br>表示サイズ</td>
+                                        <td>
+                                            <select class="select" name="w" id="w" onchange="getWidth(this);">
+                                                <option value="500px">W: 500px</option>
+                                                <option value="550px">W: 550px</option>
+                                                <option value="600px">W: 600px</option>
+                                                <option value="650px">W: 650px</option>
+                                                <option value="700px">W: 700px</option>
+                                                <option value="750px">W: 750px</option>
+                                                <option value="800px">W: 800px</option>
+                                                <option value="850px">W: 850px</option>
+                                                <option value="900px">W: 900px</option>
+                                                <option value="950px">W: 950px</option>
+                                                <option value="1000px">W: 1000px</option>
+                                                <option value="1050px">W: 1050px</option>
+                                                <option value="1100px">W: 1100px</option>
+                                            </select><select class="select select-accent" name="h" id="h" onchange="getWidth(this);">
+                                                <option value="450px">H: 450px</option>
+                                                <option value="475px">H: 475px</option>
+                                                <option value="500px">H: 500px</option>
+                                                <option value="525px">H: 525px</option>
+                                                <option value="550px">H: 550px</option>
+                                                <option value="575px">H: 575px</option>
+                                                <option value="600px">H: 600px</option>
+                                                <option value="625px">H: 625px</option>
+                                                <option value="650px">H: 650px</option>
+                                                <option value="675px">H: 675px</option>
+                                                <option value="700px">H: 700px</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Keymode(difData)<br>キー数情報
+                                            <span class="tt-wrap">
+                                                <span class="tt-icon" tabindex="0">?</span>
+                                                <span class="tt-box tt-box-mini">
+                                                    If you specify keymode here, you can omit the chart settings information to start.<br>
+                                                    ここでキーモードを指定すると、譜面ヘッダーのdifDataを省略できます。
+                                                </span>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="k" id="k">
+                                            <a onclick="cancelFile(`k`);">Cancel</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="settings-card">
+                                <div class="settings-card-title settings-card-title-3">その他</div>
+                                <table class="settings-table">
+                                    <tr>
+                                        <td>URL Query Parameters
+                                            <span class="tt-wrap">
+                                                <span class="tt-icon" tabindex="0">?</span>
+                                                <span class="tt-box tt-box-wide">
+                                                    Specify URL query parameters. Example: scoreId=2&dos=001<br>
+                                                    URLクエリパラメーターを指定します。例: scoreId=2&dos=001
+                                                </span>
+                                            </span>
+                                            <br><a class="pill-link" onclick="confirmCancelFile(`queryParams`);">Reset</a></td>
+                                        <td>
+                                            <input type="text" name="queryParams" id="queryParams" style="width:75%">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-card">
+                        <button type="button" class="accordion-toggle" data-target="advancedBody" aria-expanded="false">
+                            <span class="accordion-icon">▶</span>
+                            Advanced Settings / 上級者向け設定
+                        </button>
+                        <div class="accordion-body" id="advancedBody" hidden>
+                            <table class="settings-table">
+                                <tr>
+                                    <td>Custom JS Files
+                                        <span class="tt-wrap">
+                                            <span class="tt-icon" tabindex="0">?</span>
+                                            <span class="tt-box tt-box-wide">
+                                                Upload custom JS, common configuration files, and JS files for themes.<br>
+                                                カスタムJSや共通設定ファイル、スキン用JSファイルをアップロードできます。
+                                            </span>
+                                        </span>
+                                        <br><a class="pill-link" onclick="confirmCancelFile(`jf1`, `jf2`, `jf3`, `jf`);">Reset</a></td>
+                                    <td>
+                                        <input type="file" id="jsFile1" name="jsFile1" accept=".js"> <a onclick="cancelFile(`jsFile1`);">Cancel</a><br>
+                                        <input type="file" id="jsFile2" name="jsFile2" accept=".js"> <a onclick="cancelFile(`jsFile2`);">Cancel</a><br>
+                                        <input type="file" id="jsFile3" name="jsFile3" accept=".js"> <a onclick="cancelFile(`jsFile3`);">Cancel</a><br>
+                                        Uploaded: <input type="text" name="jf1" id="jf1" readonly><input type="text" name="jf2" id="jf2" readonly><input type="text" name="jf3" id="jf3" readonly><br>
+                                        <input type="hidden" name="jf" id="jf">
+                                        <input type="hidden" name="time" id="time">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Custom CSS Files
+                                        <span class="tt-wrap">
+                                            <span class="tt-icon" tabindex="0">?</span>
+                                            <span class="tt-box tt-box-wide">
+                                                Upload custom CSS, and CSS files for themes.<br>
+                                                カスタムCSSやスキン用CSSファイルをアップロードできます。
+                                            </span>
+                                        </span>
+                                        <br><a class="pill-link" onclick="confirmCancelFile(`cf1`, `cf2`, `cf`);">Reset</a></td>
+                                    <td>
+                                        <input type="file" id="cssFile1" name="cssFile1" accept=".css"> <a onclick="cancelFile(`cssFile1`);">Cancel</a><br>
+                                        <input type="file" id="cssFile2" name="cssFile2" accept=".css"> <a onclick="cancelFile(`cssFile2`);">Cancel</a><br>
+                                        Uploaded: <input type="text" name="cf1" id="cf1" readonly><input type="text" name="cf2" id="cf2" readonly><br>
+                                        <input type="hidden" name="cf" id="cf">
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="accordion-card accordion-warning">
+                        <button type="button" class="accordion-toggle" data-target="experimentBody" aria-expanded="false">
+                            <span class="accordion-icon">▶</span>
+                            Experiment Settings / 注意を要する設定
+                        </button>
+                        <div class="accordion-body" id="experimentBody" hidden>
+                            <table class="settings-table">
+                                <tr>
+                                    <td>Preload Values
+                                        <span class="tt-wrap">
+                                            <span class="tt-icon" tabindex="0">?</span>
+                                            <span class="tt-box tt-box-wide">
+                                                Specify the names to be pre-defined in the hidden attribute, separated by commas.<br>
+                                                事前にhidden属性で定義する名前をカンマ区切りで指定します。
+                                            </span>
+                                        </span>
+                                        <br><a class="pill-link" onclick="confirmCancelFile(`prevals`);">Reset</a></td>
+                                    <td>
+                                        <input type="text" name="prevals" id="prevals" style="width:75%" title="">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Preload JS Files
+                                        <span class="tt-wrap">
+                                            <span class="tt-icon" tabindex="0">?</span>
+                                            <span class="tt-box tt-box-wide">
+                                                Upload a batch of js files to be loaded before danoni_main.js.<br>
+                                                danoni_main.jsより前にロードするjsファイルをまとめてアップロードします。
+                                            </span>
+                                        </span>
+                                        <br><a class="pill-link" onclick="confirmCancelFile(`prejs`, `prejf`);">Reset</a></td>
+                                    <td>
+                                        <input type="file" id="prejsFiles" name="prejsFiles[]" accept=".js" title="" multiple> <a onclick="cancelFile(`prejsFiles`);">Cancel</a><br>
+                                        Uploaded: <input type="text" name="prejs" id="prejs" style="width:75%" readonly><br>
+                                        <input type="hidden" name="prejf" id="prejf">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Experiment script
+                                        <span class="tt-wrap">
+                                            <span class="tt-icon" tabindex="0">?</span>
+                                            <span class="tt-box tt-box-wide">
+                                                Enable/disable experimental scripts with new features.<br>
+                                                新しい機能を実験的に搭載したスクリプトを有効にするかどうかを設定します。
+                                            </span>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <select class="select" name="cjd" id="cjd" title="">
+                                            <option value="">--------</option>
+                                            <?php
+													$dfJsList = glob('./tmp/script/*.js');
+													foreach($dfJsList as $key => $value) {
+														echo '<option value="'.$value.'">'.basename($value).'</option>'."\n";
+													}
+												?>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
                 </form>
                 <p id="commentArea">
                 </p>
-                <script src="./danoni_preview_main.js"></script>
+                <script src="./danoni_preview_main.js?<?php echo $updateTimestamp; ?>"></script>
                 <script type="text/javascript">
                 initDanoniPreview({
                     baseAction: `<?php echo $previewConfig['baseAction']; ?>`,
@@ -368,30 +507,27 @@ const serverData = <?php echo json_encode(buildServerData(
                     noSoundPath: `<?php echo $previewConfig['noSoundPath']; ?>`,
                 });
                 </script>
+                <!--
                 <p style="text-align:center;">
                     <a id="removeKey" onclick="removeKeySave()">Remove local storage by keymode / キー別のローカルストレージを削除</a><br>
                 </p>
-                <hr>
-                <p>
+                -->
+                <div class="chart-card">
                     This site is a version verification and test play site for Dancing Onigiri (CW Edition). <br>
                     You can test play by specifying the version, chart information, and music data. <br>
                     Please use this site within the bounds of common sense. <br>
                     We are not responsible for any problems that may occur on this site.<br>
-                </p>
-                <p>
+                    <br>
                     * Uploaded data is automatically deleted at 6:00 a.m. (GMT+9) every day.<br>
-                </p>
-                <hr style="border:none;border-top:dashed 1px #cccccc;height:1px;color:#FFFFFF;">
-                <p>
+                </div>
+                <div class="chart-card">
                     このサイトは、Dancing☆Onigiri (CW Edition)のバージョン検証兼テストプレイサイトです。<br>
                     バージョンと譜面情報、楽曲データを反映することでテストプレイが可能です。<br>
                     良識の範囲でお使いください。<br>
                     このサイトで何か問題が発生したとしても、当方は免責とさせていただきます。<br>
-                </p>
-                <p>
+                    <br>
                     * アップロードされたデータは毎日午前6時に自動消去される仕組みです。<br>
-                </p>
-                <hr>
+                </div>
                 <p style="text-align:center;">
                     <a href="https://github.com/cwtickle/danoniplus" target="_blank">Dancing☆Onigiri (CW Edition) - Web-based Rhythm Game [GitHub]</a>
                 </p>

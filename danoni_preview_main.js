@@ -317,7 +317,6 @@ const initDanoniPreview = (config) => {
     window.baseVersion = baseVersion;
 
     if (versionj === 0) {
-        document.getElementById(`new`).style.color = `#999999`;
         document.getElementById(`newh`).style.color = `#999999`;
     }
     v.style.backgroundColor = v.options[v.selectedIndex].style.backgroundColor;
@@ -332,12 +331,14 @@ const initDanoniPreview = (config) => {
         pstyle: {
             applyDifKey: `18p`,
             editorLink: `https://suzme.github.io/punpane-editor/`,
+            editorLinkLabel: `Punching◇Panels エディター`,
             resetDifData: true,
             readOnlyDif: true,
         },
         pstyle_dp: {
             applyDifKey: `36p`,
             editorLink: `https://suzme.github.io/punpane-editor/?key=36p`,
+            editorLinkLabel: `Punching◇Panels エディター`,
             resetDifData: true,
             readOnlyDif: true,
         },
@@ -345,12 +346,13 @@ const initDanoniPreview = (config) => {
             // 既存のdifDataがあればそのまま維持する (force置換はしない)
             defaultDifKey: `27k`,
             editorLink: `https://suzme.github.io/kirizma-converter/`,
-            editorLinkLabel: `Converter`,
+            editorLinkLabel: `キリズマ Converter`,
         },
         '9tkey': {
             imgType: CLASSIC_IMG_TYPE,
             applyDifKey: `9t`,
             editorLink: `https://suzme.github.io/punpane-editor/?key=9t`,
+            editorLinkLabel: `Dancing☆Onigiri エディター (9tkey)`,
             resetDifData: true,
             readOnlyDif: true,
         },
@@ -397,8 +399,10 @@ const initDanoniPreview = (config) => {
 
                 document.getElementById('editorLink').href = cfg.editorLink;
                 if (cfg.editorLinkLabel) {
-                    document.getElementById('editorLink').innerHTML = cfg.editorLinkLabel;
+                    document.getElementById('editorLink').innerHTML = cfg.editorLinkLabel + ` ↗`;
                 }
+                document.getElementById('editorLink').style.visibility = `visible`;
+                document.getElementById('editorDefault').style.display = gameMode.value === `kstyle` ? `inline` : `none`;
                 if (cfg.resetDifData) {
                     difData_g = ``;
                 }
@@ -408,6 +412,7 @@ const initDanoniPreview = (config) => {
             } else {
                 // Dancing☆Onigiri (gameMode未選択)
                 document.getElementById('editorLink').style.visibility = `hidden`;
+                document.getElementById('editorDefault').style.display = `inline`;
                 document.getElementById('dos').value += `|imgType=${CLASSIC_IMG_TYPE}|`;
             }
         } else {
@@ -499,6 +504,8 @@ const initDanoniPreview = (config) => {
         document.getElementById(`srcjs`).href = `./tmp/scriptLib/danoni.js`;
     } else {
         document.getElementById(`ck`).style.visibility = `hidden`;
+        document.getElementById(`modeLbl`).style.visibility = `hidden`;
+        document.getElementById(`modett`).style.visibility = `hidden`;
     }
     if (document.getElementById('cjd').value !== '') {
         arrayCustomJs.push(`(..)${document.getElementById('cjd').value}`);
@@ -806,3 +813,16 @@ const confirmCancelFile = (...names) => {
         names.forEach(name => document.getElementById(name).value = ``);
     }
 };
+
+// Advanced Settings / Experiment Settings のアコーディオン開閉
+// (このスクリプトは対象の要素より後ろで読み込まれるため、ここで直接
+//  イベント登録してよい。preview_classic.php 側には対象の要素自体が
+//  存在しないため、該当要素なしで何も起こらず問題ない)
+document.querySelectorAll('.accordion-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const body = document.getElementById(btn.dataset.target);
+        const isHidden = body.hidden;
+        body.hidden = !isHidden;
+        btn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+    });
+});

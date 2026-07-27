@@ -74,7 +74,6 @@ for (let j = 0; j < vElements.length; j++) {
     }
 }
 if (versionj === vElements.length - 1) {
-    document.getElementById(`old`).style.color = `#999999`;
     document.getElementById(`oldh`).style.color = `#999999`;
 }
 const majorVersion = baseVersion.split(`.`)[0];
