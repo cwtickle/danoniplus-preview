@@ -225,7 +225,7 @@ const serverData = <?php echo json_encode(buildServerData(
                 <div class="chart-card">
                     <div class="chart-card-header">
                         <span class="chart-card-title">
-                            譜面データ
+                            Chart / 譜面データ
                             <span class="tt-wrap">
                                 <span class="tt-icon" tabindex="0">?</span>
                                 <span class="tt-box tt-box-wide">
@@ -253,7 +253,7 @@ const serverData = <?php echo json_encode(buildServerData(
                     <div class="settings-panes">
                         <div class="settings-pane-left">
                             <div class="settings-card">
-                                <div class="settings-card-title settings-card-title-2">ファイルアップロード</div>
+                                <div class="settings-card-title settings-card-title-2">File Upload / ファイルアップロード</div>
                                 <table class="settings-table">
                                     <tr>
                                         <td>Music File<br>楽曲ファイル
@@ -312,7 +312,7 @@ const serverData = <?php echo json_encode(buildServerData(
 
                         <div class="settings-pane-right">
                             <div class="settings-card">
-                                <div class="settings-card-title settings-card-title-1">表示設定</div>
+                                <div class="settings-card-title settings-card-title-1">Display settings / 表示設定</div>
                                 <table class="settings-table">
                                     <tr>
                                         <td style="width:24%;">Display Size<br>表示サイズ</td>
@@ -365,7 +365,7 @@ const serverData = <?php echo json_encode(buildServerData(
                             </div>
 
                             <div class="settings-card">
-                                <div class="settings-card-title settings-card-title-3">その他</div>
+                                <div class="settings-card-title settings-card-title-3">Other settings / その他</div>
                                 <table class="settings-table">
                                     <tr>
                                         <td>URL Query Parameters
