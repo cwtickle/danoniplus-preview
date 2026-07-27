@@ -496,8 +496,7 @@ const serverData = <?php echo json_encode(buildServerData(
                         </div>
                     </div>
                 </form>
-                <p id="commentArea">
-                </p>
+                <div class="chart-card" id="commentArea"></div>
                 <script src="./danoni_preview_main.js?<?php echo $updateTimestamp; ?>"></script>
                 <script type="text/javascript">
                 initDanoniPreview({
