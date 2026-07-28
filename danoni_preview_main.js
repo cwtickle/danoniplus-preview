@@ -909,6 +909,10 @@ const enhanceVersionSelect = (_selectId) => {
             }
             const item = document.createElement('div');
             item.className = 'version-combo-item';
+            if (opt.index === select.selectedIndex) {
+                item.classList.add('is-selected');
+                selectedItemEl = item;
+            }
             item.textContent = opt.text;
             item.style.backgroundColor = opt.style.backgroundColor;
             item.style.color = opt.style.color;
@@ -934,6 +938,14 @@ const enhanceVersionSelect = (_selectId) => {
         list.hidden = false;
         input.setAttribute('aria-expanded', 'true');
         highlightIndex = -1;
+
+        // 未入力(=絞り込みなし)で開いたときは、現在選択中のバージョンが
+        // 一覧の中央付近に見えるようスクロールする
+        if (keyword === '' && selectedItemEl) {
+            requestAnimationFrame(() => {
+                selectedItemEl.scrollIntoView({ block: 'center' });
+            });
+        }
     };
 
     input.addEventListener('input', () => buildList(input.value));

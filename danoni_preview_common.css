@@ -547,6 +547,12 @@ input[type=file]::file-selector-button:hover {
     filter: brightness(1.3);
 }
 
+.version-combo-item.is-selected {
+    outline: 1px solid #BAB7E0;
+    outline-offset: -1px;
+    font-weight: bold;
+}
+
 .version-combo-empty {
     padding: 8px 10px;
     font-size: 12px;
