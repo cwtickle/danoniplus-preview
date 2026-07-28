@@ -15,7 +15,7 @@ require_once __DIR__ . '/common.php';
 //                               ローカル版では未使用。unpkg等、別CDN版を今後追加する際はこの値だけ変えればよい。
 // ]
 
-$updateTimestamp = '2026-07-28_123000';
+$updateTimestamp = '2026-07-28_172000';
 $getParamPath = '';
 if ($previewConfig['type'] === 'cdn') {
 	if (isset($_GET["v"])) {
@@ -129,7 +129,7 @@ const serverData = <?php echo json_encode(buildServerData(
                 <div class="header-bar">
                     <div class="header-title-group">
                         <span class="tt-wrap">
-                            <span class="tt-icon" tabindex="0">i</span>
+                            <span class="tt-icon tt-icon-ex" tabindex="0">Manual</span>
                             <span class="tt-box tt-box-title">
                                 <a href="https://github.com/cwtickle/danoniplus/wiki/HowToUsePreview" target="wiki">プレビューサイトの使い方</a>
                                 <a href="https://github.com/cwtickle/danoniplus-docs/wiki/HowToUsePreview" target="wiki">How to Use</a>

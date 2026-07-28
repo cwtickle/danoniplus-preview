@@ -204,6 +204,13 @@ input[type=file]::file-selector-button:hover {
     cursor: help;
 }
 
+.tt-icon-ex {
+    width: 60px;
+    height: 24px;
+    font-size: 14px;
+    border-radius: 6px;
+}
+
 .tt-box {
     display: none;
     position: absolute;

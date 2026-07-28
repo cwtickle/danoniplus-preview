@@ -1,7 +1,7 @@
 ﻿<?php
 require_once __DIR__ . '/common.php';
 
-$updateTimestamp = '2026-07-28_123000';
+$updateTimestamp = '2026-07-28_172000';
 
 [$rootDir, $rootUrl] = resolveRootPaths();
 
@@ -63,7 +63,7 @@ const serverData = <?php echo json_encode(buildServerData(
                 <div class="header-bar">
                     <div class="header-title-group">
                         <span class="tt-wrap">
-                            <span class="tt-icon" tabindex="0">i</span>
+                            <span class="tt-icon tt-icon-ex" tabindex="0">Manual</span>
                             <span class="tt-box tt-box-title">
                                 <a href="https://github.com/cwtickle/danoniplus/wiki/HowToUsePreview" target="wiki">プレビューサイトの使い方</a>
                                 <a href="https://github.com/cwtickle/danoniplus-docs/wiki/HowToUsePreview" target="wiki">How to Use</a>
