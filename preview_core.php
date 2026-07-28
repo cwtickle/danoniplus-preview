@@ -15,7 +15,7 @@ require_once __DIR__ . '/common.php';
 //                               ローカル版では未使用。unpkg等、別CDN版を今後追加する際はこの値だけ変えればよい。
 // ]
 
-$updateTimestamp = '2026-07-28_172000';
+$updateTimestamp = '2026-07-28_175000';
 $getParamPath = '';
 if ($previewConfig['type'] === 'cdn') {
 	if (isset($_GET["v"])) {

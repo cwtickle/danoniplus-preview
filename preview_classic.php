@@ -1,7 +1,7 @@
 ﻿<?php
 require_once __DIR__ . '/common.php';
 
-$updateTimestamp = '2026-07-28_172000';
+$updateTimestamp = '2026-07-28_175000';
 
 [$rootDir, $rootUrl] = resolveRootPaths();
 

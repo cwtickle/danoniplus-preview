@@ -321,6 +321,8 @@ const initDanoniPreview = (config) => {
     }
     v.style.backgroundColor = v.options[v.selectedIndex].style.backgroundColor;
 
+    enhanceVersionSelect('v');
+
     // ImgType（ノートスキン）のデフォルト設定
     // ゲームモード別のキー数設定
     const gameMode = document.getElementById('g');
@@ -612,7 +614,7 @@ const initDanoniPreview = (config) => {
     const dfEvent = evt => { };
     const dfCxt = evt => true;
 
-    [`d`, `k`, `prevals`, `queryParams`].forEach(txt => {
+    [`d`, `k`, `prevals`, `queryParams`, `vSearchInput`].forEach(txt => {
         document.getElementById(txt).addEventListener('focus', () => {
             if (document.onkeydown !== dfEvent) {
                 bkEvent = document.onkeydown;
@@ -826,3 +828,150 @@ document.querySelectorAll('.accordion-toggle').forEach(btn => {
         btn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
     });
 });
+
+// バージョン選択 <select> を、検索フィルタ付きのコンボボックスに拡張する。
+// (index.php/jsdelivr.php/unpkg.php と preview_classic.php の両方で、
+//  バージョン一覧が1000件を超えることがあり、素の<select>では選びづらいための対応)
+//
+// 元の <select id="_selectId"> は削除せず、DOM上に残したまま非表示にする。
+// フォーム送信・前後移動(jumpNext/jumpPrev)・バージョン照合など、既存のJSは
+// すべてこの<select>を直接参照しているため、そのロジックには一切手を加えていない。
+// テキスト入力＋候補リストは、この<select>の内容を読み取って動的に組み立て、
+// 候補を選ぶと元の<select>のselectedIndexを変更してchangeイベントを発火させるだけ。
+const enhanceVersionSelect = (_selectId) => {
+    const select = document.getElementById(_selectId);
+    if (!select) return;
+
+    const MAX_RENDER = 100000; // 一度に描画する候補数の上限 (体感速度対策)
+
+    const wrapper = document.createElement('span');
+    wrapper.className = 'version-combo';
+
+    const input = document.createElement('input');
+    input.id = `vSearchInput`;
+    input.type = 'text';
+    input.className = 'select select-version version-combo-input';
+    input.setAttribute('autocomplete', 'off');
+    input.setAttribute('role', 'combobox');
+    input.setAttribute('aria-expanded', 'false');
+
+    const list = document.createElement('div');
+    list.className = 'version-combo-list';
+    list.hidden = true;
+
+    select.parentNode.insertBefore(wrapper, select);
+    wrapper.appendChild(input);
+    wrapper.appendChild(list);
+    wrapper.appendChild(select);
+    select.classList.add('version-combo-native');
+
+    let highlightIndex = -1;
+
+    const syncInputToSelection = () => {
+        const opt = select.options[select.selectedIndex];
+        if (!opt) return;
+        input.value = opt.text;
+        input.style.backgroundColor = opt.style.backgroundColor;
+        input.style.color = opt.style.color;
+    };
+
+    const closeList = () => {
+        list.hidden = true;
+        input.setAttribute('aria-expanded', 'false');
+        highlightIndex = -1;
+    };
+
+    const highlight = (_idx) => {
+        const items = list.querySelectorAll('.version-combo-item');
+        items.forEach(item => item.classList.remove('is-highlighted'));
+        if (items[_idx]) {
+            items[_idx].classList.add('is-highlighted');
+            items[_idx].scrollIntoView({ block: 'nearest' });
+        }
+        highlightIndex = _idx;
+    };
+
+    const chooseOption = (_optionIndex) => {
+        select.selectedIndex = _optionIndex;
+        syncInputToSelection();
+        closeList();
+        select.dispatchEvent(new Event('change'));
+    };
+
+    const buildList = (_filterText) => {
+        list.innerHTML = '';
+        const keyword = _filterText.trim().toLowerCase();
+        let shown = 0;
+
+        for (const opt of select.options) {
+            if (keyword !== '' && !opt.text.toLowerCase().includes(keyword)) {
+                continue;
+            }
+            const item = document.createElement('div');
+            item.className = 'version-combo-item';
+            item.textContent = opt.text;
+            item.style.backgroundColor = opt.style.backgroundColor;
+            item.style.color = opt.style.color;
+            item.addEventListener('mousedown', (evt) => {
+                // blur より先に発火させ、リストを閉じる前に選択を確定させる
+                evt.preventDefault();
+                chooseOption(opt.index);
+            });
+            list.appendChild(item);
+            shown++;
+            if (shown >= MAX_RENDER) {
+                break;
+            }
+        }
+
+        if (shown === 0) {
+            const empty = document.createElement('div');
+            empty.className = 'version-combo-empty';
+            empty.textContent = '該当するバージョンがありません';
+            list.appendChild(empty);
+        }
+
+        list.hidden = false;
+        input.setAttribute('aria-expanded', 'true');
+        highlightIndex = -1;
+    };
+
+    input.addEventListener('input', () => buildList(input.value));
+    input.addEventListener('focus', () => buildList(''));
+    input.addEventListener('blur', () => {
+        // クリック(mousedown)側の選択処理より後に閉じるよう、わずかに遅延させる
+        setTimeout(closeList, 150);
+    });
+
+    input.addEventListener('keydown', (evt) => {
+        const items = list.querySelectorAll('.version-combo-item');
+        if (evt.key === 'ArrowDown') {
+            evt.preventDefault();
+            if (list.hidden) {
+                buildList(input.value);
+            } else {
+                highlight(Math.min(highlightIndex + 1, items.length - 1));
+            }
+        } else if (evt.key === 'ArrowUp') {
+            evt.preventDefault();
+            highlight(Math.max(highlightIndex - 1, 0));
+        } else if (evt.key === 'Enter') {
+            evt.preventDefault();
+            if (!list.hidden && items.length > 0) {
+                const idx = highlightIndex >= 0 ? highlightIndex : 0;
+                const targetText = items[idx].textContent;
+                const opt = Array.from(select.options).find(o => o.text === targetText);
+                if (opt) {
+                    chooseOption(opt.index);
+                }
+            }
+        } else if (evt.key === 'Escape') {
+            closeList();
+        }
+    });
+
+    // jumpNext/jumpPrev等、他のロジックがselectを直接書き換えた場合も表示に反映する
+    select.addEventListener('change', syncInputToSelection);
+
+    syncInputToSelection();
+};

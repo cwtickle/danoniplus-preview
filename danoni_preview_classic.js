@@ -136,12 +136,14 @@ if (compareVersions(baseVersion, '0.28.x') < 0) {
 }
 v.style.backgroundColor = v.options[v.selectedIndex].style.backgroundColor;
 
+enhanceVersionSelect('v');
+
 // 譜面エリアにフォーカスが当たっているときだけ、onkeydown, oncontextmenu の設定をリセット
 let bkEvent, bkEventCxt;
 const dfEvent = evt => { };
 const dfCxt = evt => true;
 
-[`d`, `k`].forEach(txt => {
+[`d`, `k`, `vSearchInput`].forEach(txt => {
     document.getElementById(txt).addEventListener('focus', () => {
         if (document.onkeydown !== dfEvent) {
             bkEvent = document.onkeydown;
