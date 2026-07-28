@@ -15,7 +15,7 @@ require_once __DIR__ . '/common.php';
 //                               ローカル版では未使用。unpkg等、別CDN版を今後追加する際はこの値だけ変えればよい。
 // ]
 
-$updateTimestamp = '2026-07-27_210500';
+$updateTimestamp = '2026-07-28_123000';
 $getParamPath = '';
 if ($previewConfig['type'] === 'cdn') {
 	if (isset($_GET["v"])) {
@@ -129,7 +129,7 @@ const serverData = <?php echo json_encode(buildServerData(
                 <div class="header-bar">
                     <div class="header-title-group">
                         <span class="tt-wrap">
-                            <span class="tt-icon" tabindex="0">?</span>
+                            <span class="tt-icon" tabindex="0">i</span>
                             <span class="tt-box tt-box-title">
                                 <a href="https://github.com/cwtickle/danoniplus/wiki/HowToUsePreview" target="wiki">プレビューサイトの使い方</a>
                                 <a href="https://github.com/cwtickle/danoniplus-docs/wiki/HowToUsePreview" target="wiki">How to Use</a>
@@ -142,14 +142,14 @@ const serverData = <?php echo json_encode(buildServerData(
                         </span>
                     </div>
                     <div class="header-controls">
+                        <span id="modeLbl" class="header-label">Mode</span>
                         <span id="modett" class="tt-wrap">
-                            <span class="tt-icon" tabindex="0">?</span>
+                            <span class="tt-icon" tabindex="0">i</span>
                             <span class="tt-box tt-box-title">
                                 <a id="srcjs" target="src">js</a>
                                 <a id="srccss" target="src">css</a>
                             </span>
                         </span>
-                        <span id="modeLbl" class="header-label">Mode</span>
                         <span id="ck">
                             <select class="select" name="g" id="g" onchange="getWidth(this);">
                                 <option value="">Dancing☆Onigiri</option>
@@ -160,15 +160,15 @@ const serverData = <?php echo json_encode(buildServerData(
                             </select>
                         </span>
 
+                        <span class="header-label">Ver</span>
                         <span class="tt-wrap">
-                            <span class="tt-icon" tabindex="0">?</span>
+                            <span class="tt-icon" tabindex="0">i</span>
                             <span class="tt-box tt-box-title">
                                 <a id="versionLink" target="release">Release</a>
                                 <a id="changelog" target="changelog">Changelog</a>
                                 <a id="updateInfo" target="updateInfo">UpdateInfo</a>
                             </span>
                         </span>
-                        <span class="header-label">Ver</span>
                         <a id="newh" href="javascript:jumpPrev();" class="nav-arrow">▲</a>
                         <span id="cver" style="display:none;"></span>
                         <select class="select select-version" name="v" id="v" onchange="getVersion(this);">
