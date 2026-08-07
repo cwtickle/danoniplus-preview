@@ -65,8 +65,10 @@ const serverData = <?php echo json_encode(buildServerData(
                         <span class="tt-wrap">
                             <span class="tt-icon tt-icon-ex" tabindex="0">Manual</span>
                             <span class="tt-box tt-box-title">
-                                <a href="https://github.com/cwtickle/danoniplus/wiki/HowToUsePreview" target="wiki">プレビューサイトの使い方</a>
-                                <a href="https://github.com/cwtickle/danoniplus-docs/wiki/HowToUsePreview" target="wiki">How to Use</a>
+                                <a href="https://github.com/cwtickle/danoniplus-docs/wiki/HowToUsePreview" target="wiki">English</a>
+                                <a href="https://github.com/cwtickle/danoniplus/wiki/HowToUsePreview" target="wiki">日本語</a>
+                                ----
+                                <a href="https://github.com/cwtickle/danoniplus-preview" target="wiki">GitHub Page</a>
                             </span>
                         </span>
                         <span class="title">
@@ -139,7 +141,7 @@ const serverData = <?php echo json_encode(buildServerData(
                     <div class="settings-panes">
                         <div class="settings-pane-left">
                             <div class="settings-card">
-                                <div class="settings-card-title settings-card-title-2">File upload / ファイルアップロード</div>
+                                <div class="settings-card-title settings-card-title-2">File Upload / ファイルアップロード</div>
                                 <table class="settings-table">
                                     <tr>
                                         <td>Music File<br>楽曲ファイル</td>
@@ -163,7 +165,7 @@ const serverData = <?php echo json_encode(buildServerData(
                         </div>
                         <div class="settings-pane-right">
                             <div class="settings-card">
-                                <div class="settings-card-title settings-card-title-1">Display settings / 表示設定</div>
+                                <div class="settings-card-title settings-card-title-1">Display Settings / 表示設定</div>
                                 <table class="settings-table">
                                     <tr>
                                         <td style="width:24%;">Display Size<br>表示サイズ</td>
