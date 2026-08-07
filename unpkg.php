@@ -7,5 +7,6 @@ $previewConfig = [
     'noSoundPath'         => '(..)/tmp/nosound.mp3',
     'supportsOldVersions' => false,
     'cdnBaseUrl'          => 'https://unpkg.com/danoniplus',
+    'sourceKey'           => 'unpkg',
 ];
 require __DIR__ . '/preview_core.php';

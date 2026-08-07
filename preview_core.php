@@ -15,7 +15,7 @@ require_once __DIR__ . '/common.php';
 //                               ローカル版では未使用。unpkg等、別CDN版を今後追加する際はこの値だけ変えればよい。
 // ]
 
-$updateTimestamp = '2026-07-29_072000';
+$updateTimestamp = '2026-08-07_170000';
 $getParamPath = '';
 if ($previewConfig['type'] === 'cdn') {
 	if (isset($_GET["v"])) {
@@ -142,6 +142,21 @@ const serverData = <?php echo json_encode(buildServerData(
                         </span>
                     </div>
                     <div class="header-controls">
+                        
+                        <span id="sourceLbl" class="header-label">Source</span>
+                        <span id="sourcett" class="tt-wrap">
+                            <span class="tt-icon" tabindex="0">i</span>
+                            <span class="tt-box tt-box-mini">
+                                参照元を切り替えます。jsdelivr / unpkg は v40.4.0 以降のみ対応しているため、
+                                対応していないバージョンを表示中に切り替えると、最新版が選択されます。
+                            </span>
+                        </span>
+                        <select class="select" id="source" onchange="switchSource(this);">
+                            <option value="local" <?php echo $previewConfig['sourceKey'] === 'local' ? 'selected' : ''; ?>>Local</option>
+                            <option value="jsdelivr" <?php echo $previewConfig['sourceKey'] === 'jsdelivr' ? 'selected' : ''; ?>>JsDelivr</option>
+                            <option value="unpkg" <?php echo $previewConfig['sourceKey'] === 'unpkg' ? 'selected' : ''; ?>>UNPKG</option>
+                        </select>
+
                         <span id="modeLbl" class="header-label">Mode</span>
                         <span id="modett" class="tt-wrap">
                             <span class="tt-icon" tabindex="0">i</span>
@@ -504,6 +519,11 @@ const serverData = <?php echo json_encode(buildServerData(
                     supportsOldVersions: <?php echo $previewConfig['supportsOldVersions'] ? 'true' : 'false'; ?>,
                     templateFile: `<?php echo $previewConfig['templateFile']; ?>`,
                     noSoundPath: `<?php echo $previewConfig['noSoundPath']; ?>`,
+                    sourceUrls: {
+                        local: `./`,
+                        jsdelivr: `./jsdelivr.php`,
+                        unpkg: `./unpkg.php`,
+                    },
                 });
                 </script>
                 <!--

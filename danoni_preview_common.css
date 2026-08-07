@@ -37,7 +37,7 @@ table {
 
 .title {
     font-family: "Merriweather", "Arial", "メイリオ", "MS P ゴシック", sans-serif;
-    font-size: 24px;
+    font-size: 20px;
 }
 
 .title1 {
@@ -101,7 +101,7 @@ a:hover {
     border: 1px solid #444460;
     border-radius: 5px;
     position: relative;
-    font-size: 15px;
+    font-size: 12px;
     padding: 5px 3px;
 }
 

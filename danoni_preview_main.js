@@ -519,6 +519,12 @@ const initDanoniPreview = (config) => {
         document.getElementById('dos').value += `|customjs=${arrayCustomJs.join(',')}|`;
     }
 
+    if (compareVersions(baseVersion, '40.4.0') < 0) {
+        document.getElementById(`source`).style.visibility = `hidden`;
+        document.getElementById(`sourceLbl`).style.visibility = `hidden`;
+        document.getElementById(`sourcett`).style.visibility = `hidden`;
+    }
+
     // カスタムCSSファイルの設定
     const arrayCustomCss = [];
     const applyCustomCss = (_val, _subDirectory = ``) => {
@@ -792,11 +798,38 @@ const initDanoniPreview = (config) => {
         document.getElementById('formV').submit();
     };
 
+    // Source (Local/jsdelivr/unpkg) の切り替え。
+    // 現在選択中のバージョンの表示テキスト (例: "v42.2.0") を ?v= として
+    // 遷移先に引き継ぐ。遷移先の ?v= 解決ロジック (このファイル冒頭、
+    // preview_core.php の GET パラメータ解決部分) は、local/cdn いずれでも
+    // 既に確立済みのもの(v接頭辞の正規化・該当なし時のフォールバック等)を
+    // そのまま使うため、ここでは対応バージョンかどうかのチェックはしていない。
+    // 対応していないバージョンであれば、遷移先で自然に最新版が選ばれる。
+    const switchSource = obj => {
+        const targetUrl = config.sourceUrls?.[obj.value];
+        if (!targetUrl) {
+            return;
+        }
+        const selectedText = v.options[v.selectedIndex]?.text || ``;
+        const versionText = selectedText.split(` `)[0].replace(`(final)`, ``); // "v42.2.0 *" の "*" 等を除去
+
+        const otherParams = queryParams !== `` ? queryParams.slice(1) : ``;
+        const mergedParams = [
+            versionText !== `` ? `v=${encodeURIComponent(versionText)}` : ``,
+            otherParams,
+        ].filter(p => p !== ``).join(`&`);
+
+        document.getElementById('v').value = ``;
+        document.getElementById('formV').action = targetUrl + (mergedParams !== `` ? `?${mergedParams}` : ``);
+        document.getElementById('formV').submit();
+    };
+
     // グローバルから呼べるようにする (onclick="jumpNext();" 等のインラインハンドラ用)
     window.getVersion = getVersion;
     window.getWidth = getWidth;
     window.jumpNext = jumpNext;
     window.jumpPrev = jumpPrev;
+    window.switchSource = switchSource;
 };
 
 // キー別のローカルストレージを削除

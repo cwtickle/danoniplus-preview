@@ -6,5 +6,6 @@ $previewConfig = [
     'templateFile'        => 'template.html',
     'noSoundPath'         => 'nosound.mp3',
     'supportsOldVersions' => true,
+    'sourceKey'           => 'local',
 ];
 require __DIR__ . '/preview_core.php';
