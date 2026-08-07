@@ -155,7 +155,7 @@ const serverData = <?php echo json_encode(buildServerData(
                         </span>
                         <select class="select" id="source" onchange="switchSource(this);">
                             <option value="local" <?php echo $previewConfig['sourceKey'] === 'local' ? 'selected' : ''; ?>>Local</option>
-                            <option value="jsdelivr" <?php echo $previewConfig['sourceKey'] === 'jsdelivr' ? 'selected' : ''; ?>>JsDelivr</option>
+                            <option value="jsdelivr" <?php echo $previewConfig['sourceKey'] === 'jsdelivr' ? 'selected' : ''; ?>>jsDelivr</option>
                             <option value="unpkg" <?php echo $previewConfig['sourceKey'] === 'unpkg' ? 'selected' : ''; ?>>UNPKG</option>
                         </select>
 
