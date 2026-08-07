@@ -98,15 +98,8 @@ function compareSemanticVersions($versionA, $versionB) {
  * @return array{0: string, 1: string} [$rootDir, $rootUrl]
  */
 function resolveRootPaths() {
-    $rootDir = '';
-    $rootUrl = '';
-    if ($_SERVER['HTTP_HOST'] === 'danonicw.skr.jp') {
-        $rootDir = '/home/cw7/www/danonicw';
-        $rootUrl = 'https://danonicw.skr.jp/';
-    } else if ($_SERVER['HTTP_HOST'] === 'tickle.cloudfree.jp') {
-        $rootDir = '/home/tickle/tickle.cloudfree.jp/public_html';
-        $rootUrl = 'https://tickle.cloudfree.jp/';
-    }
+    $rootDir = $_SERVER['DOCUMENT_ROOT'];
+    $rootUrl = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . '://' . $_SERVER['HTTP_HOST'];
     return [$rootDir, $rootUrl];
 }
 
