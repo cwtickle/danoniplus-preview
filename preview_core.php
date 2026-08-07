@@ -145,10 +145,9 @@ const serverData = <?php echo json_encode(buildServerData(
                         
                         <span id="sourceLbl" class="header-label">Source</span>
                         <span id="sourcett" class="tt-wrap">
-                            <span class="tt-icon" tabindex="0">i</span>
+                            <span class="tt-icon" tabindex="0">?</span>
                             <span class="tt-box tt-box-mini">
-                                参照元を切り替えます。jsdelivr / unpkg は v40.4.0 以降のみ対応しているため、
-                                対応していないバージョンを表示中に切り替えると、最新版が選択されます。
+                                参照元を切り替えます。jsdelivr / unpkg は v40.4.0 以降のみ対応しています。
                             </span>
                         </span>
                         <select class="select" id="source" onchange="switchSource(this);">
