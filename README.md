@@ -8,7 +8,7 @@
 
 ## English
 
-### Overview
+### 📋 Overview
 **Dancing☆Onigiri Preview** (`danoniplus-preview`) is an online testing and preview tool designed for [**Dancing☆Onigiri (CW Edition)**](https://github.com/cwtickle/danoniplus), a web-based rhythm game platform.
 
 It allows chart creators and developers to test-play charts, verify compatibility across various versions (from v0.25.x to the latest release), and test custom scripts, themes, and stylesheets directly in the browser.
@@ -17,7 +17,7 @@ It allows chart creators and developers to test-play charts, verify compatibilit
 
 ---
 
-### Features
+### 🚀 Features
 
 1. **Multi-Version Support**
    - Instantly switch and test across dozens of CW Edition versions (v0.25.x ~ latest) to inspect version-specific behaviors and compatibility.
@@ -34,7 +34,7 @@ It allows chart creators and developers to test-play charts, verify compatibilit
 
 ---
 
-### How to Use
+### 🎮 How to Use
 
 1. **Visit the Site:** Go to [https://danonicw.skr.jp/](https://danonicw.skr.jp/).
 2. **Input Chart & Audio:**
@@ -47,7 +47,7 @@ It allows chart creators and developers to test-play charts, verify compatibilit
 
 ---
 
-### Disclaimer
+### ℹ️ Disclaimer
 
 - This service is provided for chart preview and testing purposes only.
 - The developer assumes no responsibility for any issues or damages arising from the use of this tool. Please use responsibly.
@@ -56,7 +56,7 @@ It allows chart creators and developers to test-play charts, verify compatibilit
 
 ## 日本語
 
-### 概要
+### 📋 概要
 **Dancing☆Onigiri Preview** (`danoniplus-preview`) は、Webリズムゲーム [**Dancing☆Onigiri (CW Edition)**](https://github.com/cwtickle/danoniplus) の譜面制作・動作検証・テストプレイをブラウザ上で行うためのプレビューツールです。
 
 最新版から過去の旧バージョン（v0.25.x 〜 最新バージョン）までの動作比較や、カスタムJavaScript / CSS（スキン・テーマ）の適用検証などを手軽に行うことができます。
@@ -65,7 +65,7 @@ It allows chart creators and developers to test-play charts, verify compatibilit
 
 ---
 
-### 主な機能
+### 🚀 主な機能
 
 1. **バージョン選択機能**
    - 多岐にわたる Dancing☆Onigiri (CW Edition) の各バージョンをドロップダウンで選択し、特定のバージョンでの挙動を即座に確認できます。
@@ -82,7 +82,7 @@ It allows chart creators and developers to test-play charts, verify compatibilit
 
 ---
 
-### 使い方
+### 🎮 使い方
 
 1. **サイトにアクセス:** [https://danonicw.skr.jp/](https://danonicw.skr.jp/) にアクセスします。
 2. **データの準備 & 投入:**
@@ -95,7 +95,7 @@ It allows chart creators and developers to test-play charts, verify compatibilit
 
 ---
 
-### 注意事項・免責事項
+### ℹ️ 注意事項・免責事項
 
 - 本サイトはテストプレイおよび動作検証を目的としたツールです。
 - 当サイトの利用により生じた直接的・間接的な損害について、開発者は一切の責任を負いません。良識の範囲内でご使用ください。
