@@ -99,7 +99,7 @@ function compareSemanticVersions($versionA, $versionB) {
  */
 function resolveRootPaths() {
     $rootDir = $_SERVER['DOCUMENT_ROOT'];
-    $rootUrl = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . '://' . $_SERVER['HTTP_HOST'];
+    $rootUrl = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . '://' . $_SERVER['HTTP_HOST'] . '/';
     return [$rootDir, $rootUrl];
 }
 
