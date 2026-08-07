@@ -9,7 +9,7 @@
 ## English
 
 ### Overview
-**Dancing☆Onigiri Preview** (`danoniplus-preview`) is an online testing and preview tool designed for **Dancing☆Onigiri (CW Edition)**, a web-based rhythm game platform.
+**Dancing☆Onigiri Preview** (`danoniplus-preview`) is an online testing and preview tool designed for [**Dancing☆Onigiri (CW Edition)**](https://github.com/cwtickle/danoniplus), a web-based rhythm game platform.
 
 It allows chart creators and developers to test-play charts, verify compatibility across various versions (from v0.25.x to the latest release), and test custom scripts, themes, and stylesheets directly in the browser.
 
@@ -57,7 +57,7 @@ It allows chart creators and developers to test-play charts, verify compatibilit
 ## 日本語
 
 ### 概要
-**Dancing☆Onigiri Preview** (`danoniplus-preview`) は、Webリズムゲーム **Dancing☆Onigiri (CW Edition)** の譜面制作・動作検証・テストプレイをブラウザ上で行うためのプレビューツールです。
+**Dancing☆Onigiri Preview** (`danoniplus-preview`) は、Webリズムゲーム [**Dancing☆Onigiri (CW Edition)**](https://github.com/cwtickle/danoniplus) の譜面制作・動作検証・テストプレイをブラウザ上で行うためのプレビューツールです。
 
 最新版から過去の旧バージョン（v0.25.x 〜 最新バージョン）までの動作比較や、カスタムJavaScript / CSS（スキン・テーマ）の適用検証などを手軽に行うことができます。
 
@@ -104,5 +104,5 @@ It allows chart creators and developers to test-play charts, verify compatibilit
 
 ## Author / Credits
 
-- **Developer:** [CW (cwtickle)](https://github.com/cwtickle)
+- **Developer:** [tickle (cwtickle)](https://github.com/cwtickle)
 - **Official Site:** [Dancing☆Onigiri Preview](https://danonicw.skr.jp/)
