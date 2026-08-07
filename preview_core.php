@@ -15,7 +15,7 @@ require_once __DIR__ . '/common.php';
 //                               ローカル版では未使用。unpkg等、別CDN版を今後追加する際はこの値だけ変えればよい。
 // ]
 
-$updateTimestamp = '2026-08-07_170000';
+$updateTimestamp = '2026-08-07_190000';
 $getParamPath = '';
 if ($previewConfig['type'] === 'cdn') {
 	if (isset($_GET["v"])) {
@@ -147,6 +147,7 @@ const serverData = <?php echo json_encode(buildServerData(
                         <span id="sourcett" class="tt-wrap">
                             <span class="tt-icon" tabindex="0">?</span>
                             <span class="tt-box tt-box-mini">
+                                Switch the source. jsdelivr and unpkg are supported only for version 40.4.0 and later.<br>
                                 参照元を切り替えます。jsdelivr / unpkg は v40.4.0 以降のみ対応しています。
                             </span>
                         </span>

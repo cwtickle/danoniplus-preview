@@ -243,6 +243,8 @@ input[type=file]::file-selector-button:hover {
 }
 
 .tt-box-mini {
+    left: 0;
+    top: 20px;
     width: 200px;
     white-space: normal;
 }
