@@ -1,6 +1,6 @@
 # Dancing☆Onigiri Preview
 
-<img width="80%" alt="Image" src="https://github.com/user-attachments/assets/ae693e5c-4173-4d5e-bc37-e2d183cd373a" />
+<img width="80%" src="https://github.com/user-attachments/assets/106a9d50-98d5-464e-a005-d02b15344a84" />
 
 [English](#english) | [日本語](#日本語)
 
