@@ -1070,5 +1070,9 @@ const enhanceVersionSelect = (_selectId) => {
         dataTransfer.items.add(file);
         musicInput.files = dataTransfer.files;
         musicInput.dispatchEvent(new Event('change'));
+
+        if (typeof makeInfoWindow === 'function') {
+            makeInfoWindow(`Dropped file: ${file.name}`, `leftToRightFade`);
+        }
     });
 })();
