@@ -1020,3 +1020,55 @@ const enhanceVersionSelect = (_selectId) => {
 
     syncInputToSelection();
 };
+
+// プレビュー画面(#canvas-frame)への楽曲ファイルのドラッグ&ドロップ対応。
+// dragover / dragleave / drop 以外のイベントには一切触れないため、
+// プレビュー自体のマウス操作・キーボード操作には影響しない。
+// index.php/jsdelivr.php/unpkg.php・preview_classic.php いずれも
+// #canvas-frame と #musicFile を持つため、ここで一括して有効化している。
+(() => {
+    const frame = document.getElementById('canvas-frame');
+    const musicInput = document.getElementById('musicFile');
+    if (!frame || !musicInput) {
+        return;
+    }
+
+    const acceptExts = ['mp3', 'mp4', 'm4a', 'ogg', 'oga', 'aac', 'flac', 'js'];
+
+    const isFileDrag = evt => !!evt.dataTransfer?.types?.includes('Files');
+
+    frame.addEventListener('dragover', evt => {
+        if (!isFileDrag(evt)) {
+            return;
+        }
+        evt.preventDefault();
+        frame.classList.add('is-dragover');
+    });
+
+    frame.addEventListener('dragleave', () => {
+        frame.classList.remove('is-dragover');
+    });
+
+    frame.addEventListener('drop', evt => {
+        if (!isFileDrag(evt)) {
+            return;
+        }
+        evt.preventDefault();
+        frame.classList.remove('is-dragover');
+
+        const file = evt.dataTransfer.files[0];
+        if (!file) {
+            return;
+        }
+        const ext = file.name.split('.').pop().toLowerCase();
+        if (!acceptExts.includes(ext)) {
+            return;
+        }
+
+        // input[type=file] へのファイル割り当ては DataTransfer 経由でのみ可能
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        musicInput.files = dataTransfer.files;
+        musicInput.dispatchEvent(new Event('change'));
+    });
+})();

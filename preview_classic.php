@@ -1,7 +1,7 @@
 ﻿<?php
 require_once __DIR__ . '/common.php';
 
-$updateTimestamp = '2026-08-07_190000';
+$updateTimestamp = '2026-08-09_180000';
 
 [$rootDir, $rootUrl] = resolveRootPaths();
 
@@ -128,7 +128,7 @@ const serverData = <?php echo json_encode(buildServerData(
                             </span>
                         </span>
                         <span class="chart-card-links">
-                            <a href="https://superkuppabros.github.io/danoni-editor/" target="_blank">Dancing☆Onigiri エディター (CW Edition対応)</a>
+                            <a id="editorsub" onclick="window.open('https://superkuppabros.github.io/danoni-editor/', '_blank', 'width=800px,height=500px');return false;">Dancing☆Onigiri エディター</a>
                             (<a href="<?php echo $rootUrl; ?>editor/" target="_blank">Mirror</a>) ↗
                         </span>
                         <span class="chart-card-actions">

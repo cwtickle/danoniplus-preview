@@ -15,7 +15,7 @@ require_once __DIR__ . '/common.php';
 //                               ローカル版では未使用。unpkg等、別CDN版を今後追加する際はこの値だけ変えればよい。
 // ]
 
-$updateTimestamp = '2026-08-07_190000';
+$updateTimestamp = '2026-08-09_180000';
 $getParamPath = '';
 if ($previewConfig['type'] === 'cdn') {
 	if (isset($_GET["v"])) {
@@ -253,9 +253,8 @@ const serverData = <?php echo json_encode(buildServerData(
                         </span>
                         <span class="chart-card-links">
                             <span id="editorDefault">
-                                <a href="https://superkuppabros.github.io/danoni-editor/" target="_blank">Dancing☆Onigiri エディター</a>
-                                (<a id="editorsub" onclick="window.open('https://superkuppabros.github.io/danoni-editor/', '_blank', 'width=800px,height=500px');return false;">Window</a> / 
-                                <a href="./editor/" target="_blank">Mirror</a>) ↗
+                                <a id="editorsub" onclick="window.open('https://superkuppabros.github.io/danoni-editor/', '_blank', 'width=800px,height=500px');return false;">Dancing☆Onigiri エディター</a>
+                                (<a href="./editor/" target="_blank">Mirror</a>) ↗
                             </span>
                             <a id="editorLink" target="editor">Editor</a>
                         </span>
