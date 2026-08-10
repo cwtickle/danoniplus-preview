@@ -104,7 +104,7 @@ const applyPreviewDosCommonData = ({
         return;
     }
 
-    if (dosData.indexOf('|musicTitle=') !== -1) {
+    if (typeof dosData === `string` && dosData.includes(`|musicTitle=`)) {
         target.value += `|musicUrl=${noSoundPath}|`;
     } else {
         target.value += musicDataValue;
