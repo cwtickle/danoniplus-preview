@@ -1,4 +1,4 @@
-﻿/**
+/**
  * index.php (ローカル版) と jsdelivr.php / unpkg.php (CDN版) で共有するメイン処理。
  *
  * 呼び出し側は先に serverData (各PHPが出力する <script> ブロック) を
@@ -79,6 +79,84 @@ const compareVersions = (versionA, versionB) => {
         }
     }
     return 0; // versionA and versionB are equal
+};
+
+const escapeStrOld = (_str) => {
+    const escList = [
+        ['*bkquo*', '‘'],
+        ['*squo*', "’"],
+        ['*quot*', '”'],
+        ['*amp*', '＆']
+    ];
+    escList.forEach(rep => _str = _str.replaceAll(rep[0], rep[1]));
+    return _str;
+};
+
+const hasStringMarker = (target, marker) => typeof target === `string` && target.includes(marker);
+
+const applyPreviewDosCommonData = ({
+    dosData,
+    difDataValue,
+    musicDataValue,
+    noSoundPath,
+    musicUrlPrefix = ``,
+}) => {
+    const target = document.getElementById('dos');
+    if (!target) {
+        return;
+    }
+
+    if (hasStringMarker(dosData, `|musicTitle=`)) {
+        target.value += `|musicUrl=${noSoundPath}|`;
+    } else {
+        target.value += musicDataValue;
+    }
+
+    if (difDataValue !== '') {
+        const tmpDifData = [];
+        difDataValue.split(`$`).forEach(difs => tmpDifData.push(difs.split(`,`).length > 2 ? difs : `${difs},Normal,3.5`));
+        target.value += `|difData=${tmpDifData.join('$')}|`;
+        const kTarget = document.getElementById('k');
+        if (kTarget) {
+            kTarget.value = difDataValue;
+        }
+    }
+
+    const musicFileInput = document.getElementById('mf');
+    const timeInput = document.getElementById('time');
+    if (musicFileInput?.value !== '' && timeInput) {
+        target.value += `|musicUrl=${musicUrlPrefix}${timeInput.value + `_` + musicFileInput.value}|`;
+    }
+};
+
+const setupPreviewFocusReset = (targetIds, { onBlur } = {}) => {
+    let bkEvent;
+    let bkEventCxt;
+    const dfEvent = evt => { };
+    const dfCxt = evt => true;
+
+    targetIds.forEach(txt => {
+        const target = document.getElementById(txt);
+        if (!target) {
+            return;
+        }
+
+        target.addEventListener('focus', () => {
+            if (document.onkeydown !== dfEvent) {
+                bkEvent = document.onkeydown;
+                bkEventCxt = document.oncontextmenu;
+            }
+            document.onkeydown = dfEvent;
+            document.oncontextmenu = dfCxt;
+        });
+        target.addEventListener('blur', () => {
+            document.onkeydown = bkEvent;
+            document.oncontextmenu = bkEventCxt;
+            if (onBlur) {
+                onBlur(txt);
+            }
+        });
+    });
 };
 
 // serverData.post の値をフォームへ反映し、アップロードされたファイル情報を
@@ -378,7 +456,7 @@ const initDanoniPreview = (config) => {
             // (pstyle / pstyle_dp / 9tkey で共通のパターン。kstyleは既存データがあれば
             //  そのまま維持する仕様のため、defaultDifKeyという別扱いにしている)
             const applyDifDataKey = _key => {
-                if (document.getElementById('dos').value.indexOf(`|difData=`) < 0) {
+                if (!hasStringMarker(document.getElementById('dos').value, `|difData=`)) {
                     document.getElementById('dos').value += `|difData=${_key}|`;
                 } else {
                     document.getElementById('dos').value += replaceDifs(_key);
@@ -392,7 +470,7 @@ const initDanoniPreview = (config) => {
                 }
                 if (cfg.applyDifKey) {
                     applyDifDataKey(cfg.applyDifKey);
-                } else if (cfg.defaultDifKey && document.getElementById('dos').value.indexOf(`|difData=`) < 0) {
+                } else if (cfg.defaultDifKey && !hasStringMarker(document.getElementById('dos').value, `|difData=`)) {
                     document.getElementById('dos').value += `|difData=${cfg.defaultDifKey}|`;
                 }
 
@@ -442,22 +520,13 @@ const initDanoniPreview = (config) => {
         document.getElementById('externalDosCharset').value = `${document.getElementById('dosM').value}`;
     }
 
-    // 楽曲名情報の設定 (musicUrlについては指定の有無によらず一旦上書きし、既存のデータは使わない)
-    if (dosData.indexOf('|musicTitle=') !== -1) {
-        document.getElementById('dos').value += `|musicUrl=${config.noSoundPath}|`;
-    } else {
-        document.getElementById('dos').value += musicData_g;
-    }
-
-    if (difData_g !== '') {
-        document.getElementById('dos').value += '|difData=' + difData_g + '|';
-        document.getElementById('k').value = difData_g;
-    }
-
-    // 音源ファイルの設定 (ファイル名が動的に変わるためここで設定)
-    if (document.getElementById('mf').value !== '') {
-        document.getElementById('dos').value += `|musicUrl=(..)/tmp/${document.getElementById('time').value + `_` + document.getElementById('mf').value}|`;
-    }
+    applyPreviewDosCommonData({
+        dosData,
+        difDataValue: difData_g,
+        musicDataValue: musicData_g,
+        noSoundPath: config.noSoundPath,
+        musicUrlPrefix: `(..)/tmp/`,
+    });
 
     // v45.0.0以降、CDNから参照するゲームモード別の追加ライブラリ設定
     // (kstyle, pstyle, pstyle_dp 以外は従来通りローカルの scriptLib を参照する)
@@ -613,22 +682,8 @@ const initDanoniPreview = (config) => {
     });
 
     // 譜面エリアにフォーカスが当たっているときだけ、onkeydown, oncontextmenu の設定をリセット
-    let bkEvent, bkEventCxt;
-    const dfEvent = evt => { };
-    const dfCxt = evt => true;
-
-    [`d`, `k`, `prevals`, `queryParams`, `vSearchInput`].forEach(txt => {
-        document.getElementById(txt).addEventListener('focus', () => {
-            if (document.onkeydown !== dfEvent) {
-                bkEvent = document.onkeydown;
-                bkEventCxt = document.oncontextmenu;
-            }
-            document.onkeydown = dfEvent;
-            document.oncontextmenu = dfCxt;
-        });
-        document.getElementById(txt).addEventListener('blur', () => {
-            document.onkeydown = bkEvent;
-            document.oncontextmenu = bkEventCxt;
+    setupPreviewFocusReset([`d`, `k`, `prevals`, `queryParams`, `vSearchInput`], {
+        onBlur: txt => {
             if (txt === `queryParams`) {
                 if (document.getElementById(txt)?.value !== ``) {
                     document.getElementById('formV').action = `${config.baseAction}?` + document.getElementById(txt).value;
@@ -636,7 +691,7 @@ const initDanoniPreview = (config) => {
                     document.getElementById('formV').action = config.baseAction;
                 }
             }
-        });
+        },
     });
 
     applyLocalStorageDefaults({
