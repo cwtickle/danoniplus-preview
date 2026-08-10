@@ -406,10 +406,6 @@ input[type=file]::file-selector-button:hover {
     border: none;
 }
 
-.settings-table tr:nth-child(2n) {
-    background: none;
-}
-
 .settings-table td {
     padding: 8px 6px;
     vertical-align: top;

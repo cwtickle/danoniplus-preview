@@ -222,15 +222,3 @@ function jumpPrev() {
     document.getElementById('formV').action = redirectUrl + queryParams;
     document.getElementById('formV').submit();
 }
-
-// 特殊文字を全角文字に置換 (v14.5.0以前用)
-function escapeStrOld(_str) {
-    const escList = [
-        ['*bkquo*', '‘'],
-        ['*squo*', "’"],
-        ['*quot*', '”'],
-        ['*amp*', '＆']
-    ];
-    escList.forEach(rep => _str = _str.replaceAll(rep[0], rep[1]));
-    return _str;
-}
