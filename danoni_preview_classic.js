@@ -24,8 +24,8 @@ let difData_g = initialDifData_g;
 
 applyPreviewDosCommonData({
     dosData,
-    difData_g,
-    musicData_g,
+    difDataValue: difData_g,
+    musicDataValue: musicData_g,
     noSoundPath: `nosound.mp3`,
 });
 

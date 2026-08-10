@@ -94,8 +94,8 @@ const escapeStrOld = (_str) => {
 
 const applyPreviewDosCommonData = ({
     dosData,
-    difData_g,
-    musicData_g,
+    difDataValue,
+    musicDataValue,
     noSoundPath,
     musicUrlPrefix = ``,
 }) => {
@@ -107,16 +107,16 @@ const applyPreviewDosCommonData = ({
     if (dosData.indexOf('|musicTitle=') !== -1) {
         target.value += `|musicUrl=${noSoundPath}|`;
     } else {
-        target.value += musicData_g;
+        target.value += musicDataValue;
     }
 
-    if (difData_g !== '') {
+    if (difDataValue !== '') {
         const tmpDifData = [];
-        difData_g.split(`$`).forEach(difs => tmpDifData.push(difs.split(`,`).length > 2 ? difs : `${difs},Normal,3.5`));
+        difDataValue.split(`$`).forEach(difs => tmpDifData.push(difs.split(`,`).length > 2 ? difs : `${difs},Normal,3.5`));
         target.value += `|difData=${tmpDifData.join('$')}|`;
         const kTarget = document.getElementById('k');
         if (kTarget) {
-            kTarget.value = difData_g;
+            kTarget.value = difDataValue;
         }
     }
 
@@ -520,8 +520,8 @@ const initDanoniPreview = (config) => {
 
     applyPreviewDosCommonData({
         dosData,
-        difData_g,
-        musicData_g,
+        difDataValue: difData_g,
+        musicDataValue: musicData_g,
         noSoundPath: config.noSoundPath,
         musicUrlPrefix: `(..)/tmp/`,
     });
