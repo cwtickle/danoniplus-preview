@@ -74,7 +74,7 @@ if (compareVersions(baseVersion, '14.5.1') < 0) {
 // v3.6.0より前はカスタム設定がdanoni_main.jsで未定義のため追加
 if (compareVersions(baseVersion, '3.6.0') < 0) {
     [`Title`, `TitleArrow`, `Back`, `BackMain`, `Ready`].forEach(pattern => {
-        if (dosData.indexOf(`custom${pattern}Use`) === -1) {
+        if (!hasStringMarker(dosData, `custom${pattern}Use`)) {
             document.getElementById('dos').value += `|custom${pattern}Use=false|`;
         }
     });
@@ -98,23 +98,23 @@ if (compareVersions(baseVersion, '0.62.x') < 0) {
 }
 // v0.53.xより前は各主要項目の補完処理が無いため、初期値を入れる
 if (compareVersions(baseVersion, '0.53.x') < 0) {
-    if (dosData.indexOf('|setColor=') === -1) {
+    if (!hasStringMarker(dosData, '|setColor=')) {
         document.getElementById('dos').value += `
                                     |setColor=0xcccccc,0xff9999,0xffffff|`;
     }
-    if (dosData.indexOf('|frzColor=') === -1) {
+    if (!hasStringMarker(dosData, '|frzColor=')) {
         document.getElementById('dos').value += `
                                     |frzColor=0x999999,0x999999,0x999999,0x999999,0x999999|`;
     }
-    if (dosData.indexOf('|tuning=') === -1) {
+    if (!hasStringMarker(dosData, '|tuning=')) {
         document.getElementById('dos').value += `|tuning=name|`;
     }
-    if (dosData.indexOf('|boost_data=') === -1) {
+    if (!hasStringMarker(dosData, '|boost_data=')) {
         document.getElementById('dos').value += `|boost_data=200,1|`;
     }
 }
 // v0.43.xより前はdifDataの補完処理が無いため、初期値を入れる
-if (compareVersions(baseVersion, '0.43.x') < 0 && dosData.indexOf('|difData=') === -1 && difData_g === '') {
+if (compareVersions(baseVersion, '0.43.x') < 0 && !hasStringMarker(dosData, '|difData=') && difData_g === '') {
     document.getElementById('dos').value += `
                                 |difData=7,Normal,3.5|`;
 }

@@ -92,6 +92,8 @@ const escapeStrOld = (_str) => {
     return _str;
 };
 
+const hasStringMarker = (target, marker) => typeof target === `string` && target.includes(marker);
+
 const applyPreviewDosCommonData = ({
     dosData,
     difDataValue,
@@ -104,7 +106,7 @@ const applyPreviewDosCommonData = ({
         return;
     }
 
-    if (typeof dosData === `string` && dosData.includes(`|musicTitle=`)) {
+    if (hasStringMarker(dosData, `|musicTitle=`)) {
         target.value += `|musicUrl=${noSoundPath}|`;
     } else {
         target.value += musicDataValue;
@@ -454,7 +456,7 @@ const initDanoniPreview = (config) => {
             // (pstyle / pstyle_dp / 9tkey で共通のパターン。kstyleは既存データがあれば
             //  そのまま維持する仕様のため、defaultDifKeyという別扱いにしている)
             const applyDifDataKey = _key => {
-                if (document.getElementById('dos').value.indexOf(`|difData=`) < 0) {
+                if (!hasStringMarker(document.getElementById('dos').value, `|difData=`)) {
                     document.getElementById('dos').value += `|difData=${_key}|`;
                 } else {
                     document.getElementById('dos').value += replaceDifs(_key);
@@ -468,7 +470,7 @@ const initDanoniPreview = (config) => {
                 }
                 if (cfg.applyDifKey) {
                     applyDifDataKey(cfg.applyDifKey);
-                } else if (cfg.defaultDifKey && document.getElementById('dos').value.indexOf(`|difData=`) < 0) {
+                } else if (cfg.defaultDifKey && !hasStringMarker(document.getElementById('dos').value, `|difData=`)) {
                     document.getElementById('dos').value += `|difData=${cfg.defaultDifKey}|`;
                 }
 
