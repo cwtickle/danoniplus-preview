@@ -80,10 +80,6 @@ if ($previewConfig['type'] === 'cdn') {
     td {
         padding: 2px;
     }
-
-    tr:nth-child(2n) {
-        background: #333333;
-    }
     </style>
 <?php
 
