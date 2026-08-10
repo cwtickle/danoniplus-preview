@@ -13,6 +13,7 @@ require_once __DIR__ . '/common.php';
 //     'supportsOldVersions'  => v19.4.0未満のバージョンをサポートするか (JS用),
 //     'cdnBaseUrl'           => CDN版の場合のパッケージ配信元ベースURL (例: 'https://cdn.jsdelivr.net/npm/danoniplus')
 //                               ローカル版では未使用。unpkg等、別CDN版を今後追加する際はこの値だけ変えればよい。
+//     'sourceKey'            => 'local' | 'jsdelivr' | 'unpkg' など、参照元を切り替えるためのキー
 // ]
 
 $updateTimestamp = '2026-08-10_060000';
@@ -335,31 +336,17 @@ const serverData = <?php echo json_encode(buildServerData(
                                         <td style="width:24%;">Display Size<br>表示サイズ</td>
                                         <td>
                                             <select class="select" name="w" id="w" onchange="getWidth(this);">
-                                                <option value="500px">W: 500px</option>
-                                                <option value="550px">W: 550px</option>
-                                                <option value="600px">W: 600px</option>
-                                                <option value="650px">W: 650px</option>
-                                                <option value="700px">W: 700px</option>
-                                                <option value="750px">W: 750px</option>
-                                                <option value="800px">W: 800px</option>
-                                                <option value="850px">W: 850px</option>
-                                                <option value="900px">W: 900px</option>
-                                                <option value="950px">W: 950px</option>
-                                                <option value="1000px">W: 1000px</option>
-                                                <option value="1050px">W: 1050px</option>
-                                                <option value="1100px">W: 1100px</option>
+                                            <?php 
+                                                for($width = 500; $width <= 1100; $width += 50) {
+                                                    echo '<option value="'.$width.'px">W: '.$width.'px</option>' . "\n";
+                                                }
+                                            ?>
                                             </select><select class="select select-accent" name="h" id="h" onchange="getWidth(this);">
-                                                <option value="450px">H: 450px</option>
-                                                <option value="475px">H: 475px</option>
-                                                <option value="500px">H: 500px</option>
-                                                <option value="525px">H: 525px</option>
-                                                <option value="550px">H: 550px</option>
-                                                <option value="575px">H: 575px</option>
-                                                <option value="600px">H: 600px</option>
-                                                <option value="625px">H: 625px</option>
-                                                <option value="650px">H: 650px</option>
-                                                <option value="675px">H: 675px</option>
-                                                <option value="700px">H: 700px</option>
+                                            <?php
+                                                for($height = 450; $height <= 700; $height += 25) {
+                                                    echo '<option value="'.$height.'px">H: '.$height.'px</option>' . "\n";
+                                                }
+                                            ?>
                                             </select>
                                         </td>
                                     </tr>

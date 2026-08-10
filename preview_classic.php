@@ -170,19 +170,11 @@ const serverData = <?php echo json_encode(buildServerData(
                                         <td style="width:24%;">Display Size<br>表示サイズ</td>
                                         <td>
                                             <select class="select" name="w" id="w" onchange="getWidth(this);">
-                                                <option value="500px">W: 500px</option>
-                                                <option value="550px">W: 550px</option>
-                                                <option value="600px">W: 600px</option>
-                                                <option value="650px">W: 650px</option>
-                                                <option value="700px">W: 700px</option>
-                                                <option value="750px">W: 750px</option>
-                                                <option value="800px">W: 800px</option>
-                                                <option value="850px">W: 850px</option>
-                                                <option value="900px">W: 900px</option>
-                                                <option value="950px">W: 950px</option>
-                                                <option value="1000px">W: 1000px</option>
-                                                <option value="1050px">W: 1050px</option>
-                                                <option value="1100px">W: 1100px</option>
+                                            <?php
+                                                for ($width = 500; $width <= 1100; $width += 50) {
+                                                    echo '<option value="' . $width . 'px">W: ' . $width . 'px</option>' . "\n";
+                                                }
+                                            ?>
                                             </select>
                                         </td>
                                     </tr>
