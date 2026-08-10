@@ -403,11 +403,11 @@ const serverData = <?php echo json_encode(buildServerData(
                     </div>
 
                     <div class="accordion-card">
-                        <button type="button" class="accordion-toggle" data-target="advancedBody" aria-expanded="false">
+                        <button type="button" class="accordion-toggle" data-target="advancedBody" aria-expanded="true">
                             <span class="accordion-icon">▶</span>
                             Advanced Settings / 上級者向け設定
                         </button>
-                        <div class="accordion-body" id="advancedBody" hidden>
+                        <div class="accordion-body" id="advancedBody">
                             <table class="settings-table">
                                 <tr>
                                     <td>Custom JS Files
