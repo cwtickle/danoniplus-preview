@@ -15,7 +15,7 @@ require_once __DIR__ . '/common.php';
 //                               ローカル版では未使用。unpkg等、別CDN版を今後追加する際はこの値だけ変えればよい。
 // ]
 
-$updateTimestamp = '2026-08-09_190000';
+$updateTimestamp = '2026-08-10_060000';
 $getParamPath = '';
 if ($previewConfig['type'] === 'cdn') {
 	if (isset($_GET["v"])) {
@@ -418,12 +418,10 @@ const serverData = <?php echo json_encode(buildServerData(
                                                 カスタムJSや共通設定ファイル、スキン用JSファイルをアップロードできます。
                                             </span>
                                         </span>
-                                        <br><a class="pill-link" onclick="confirmCancelFile(`jf1`, `jf2`, `jf3`, `jf`);">Reset</a></td>
+                                        <br><a class="pill-link" onclick="confirmCancelFile(`jfs`, `jf`);">Reset</a></td>
                                     <td>
-                                        <input type="file" id="jsFile1" name="jsFile1" accept=".js"> <a onclick="cancelFile(`jsFile1`);">Cancel</a><br>
-                                        <input type="file" id="jsFile2" name="jsFile2" accept=".js"> <a onclick="cancelFile(`jsFile2`);">Cancel</a><br>
-                                        <input type="file" id="jsFile3" name="jsFile3" accept=".js"> <a onclick="cancelFile(`jsFile3`);">Cancel</a><br>
-                                        Uploaded: <input type="text" name="jf1" id="jf1" readonly><input type="text" name="jf2" id="jf2" readonly><input type="text" name="jf3" id="jf3" readonly><br>
+                                        <input type="file" id="jsFiles" name="jsFiles[]" accept=".js" title="" multiple> <a onclick="cancelFile(`jsFiles`);">Cancel</a><br>
+                                        Uploaded: <input type="text" name="jfs" id="jfs" style="width:75%" readonly><br>
                                         <input type="hidden" name="jf" id="jf">
                                         <input type="hidden" name="time" id="time">
                                     </td>
@@ -437,11 +435,10 @@ const serverData = <?php echo json_encode(buildServerData(
                                                 カスタムCSSやスキン用CSSファイルをアップロードできます。
                                             </span>
                                         </span>
-                                        <br><a class="pill-link" onclick="confirmCancelFile(`cf1`, `cf2`, `cf`);">Reset</a></td>
+                                        <br><a class="pill-link" onclick="confirmCancelFile(`cfs`, `cf`);">Reset</a></td>
                                     <td>
-                                        <input type="file" id="cssFile1" name="cssFile1" accept=".css"> <a onclick="cancelFile(`cssFile1`);">Cancel</a><br>
-                                        <input type="file" id="cssFile2" name="cssFile2" accept=".css"> <a onclick="cancelFile(`cssFile2`);">Cancel</a><br>
-                                        Uploaded: <input type="text" name="cf1" id="cf1" readonly><input type="text" name="cf2" id="cf2" readonly><br>
+                                        <input type="file" id="cssFiles" name="cssFiles[]" accept=".css" title="" multiple> <a onclick="cancelFile(`cssFiles`);">Cancel</a><br>
+                                        Uploaded: <input type="text" name="cfs" id="cfs" style="width:75%" readonly><br>
                                         <input type="hidden" name="cf" id="cf">
                                     </td>
                                 </tr>

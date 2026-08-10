@@ -141,9 +141,7 @@ const applyServerDataToForm = (_config) => {
     // ▼ カスタムJS
     if (serverData.upload.js.length > 0) {
         // 表示用（タイムスタンプなし）
-        document.getElementById('jf1').value = serverData.post.jf1 || '';
-        document.getElementById('jf2').value = serverData.post.jf2 || '';
-        document.getElementById('jf3').value = serverData.post.jf3 || '';
+        document.getElementById('jfs').value = serverData.post.jfs || '';
 
         // 読み込み用（タイムスタンプ付き）
         const jsList = serverData.upload.js.map(f => `${prefix.js}${f}`).join(',');
@@ -153,8 +151,7 @@ const applyServerDataToForm = (_config) => {
 
     // ▼ カスタムCSS
     if (serverData.upload.css.length > 0) {
-        document.getElementById('cf1').value = serverData.post.cf1 || '';
-        document.getElementById('cf2').value = serverData.post.cf2 || '';
+        document.getElementById('cfs').value = serverData.post.cfs || '';
 
         const cssList = serverData.upload.css.map(f => `${prefix.css}${f}`).join(',');
         document.getElementById('cf').value = cssList;

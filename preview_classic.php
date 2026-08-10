@@ -1,7 +1,7 @@
 ﻿<?php
 require_once __DIR__ . '/common.php';
 
-$updateTimestamp = '2026-08-09_190000';
+$updateTimestamp = '2026-08-19_060000';
 
 [$rootDir, $rootUrl] = resolveRootPaths();
 
@@ -151,11 +151,10 @@ const serverData = <?php echo json_encode(buildServerData(
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Custom JS Files<br><a class="pill-link" onclick="confirmCancelFile(`jf1`, `jf2`, `jf3`, `jf`);">Reset</a></td>
+                                        <td>Custom JS Files<br><a class="pill-link" onclick="confirmCancelFile(`jfs`, `jf`);">Reset</a></td>
                                         <td>
-                                            <input type="file" id="jsFile1" name="jsFile1" accept=".js"> <a onclick="cancelFile(`jsFile1`);">Cancel</a><br>
-                                            <input type="file" id="jsFile2" name="jsFile2" accept=".js"> <a onclick="cancelFile(`jsFile2`);">Cancel</a><br>
-                                            Uploaded: <input type="text" name="jf1" id="jf1" readonly><input type="text" name="jf2" id="jf2" readonly><input type="text" name="jf3" id="jf3" readonly><br>
+                                            <input type="file" id="jsFiles" name="jsFiles[]" accept=".js" title="" multiple> <a onclick="cancelFile(`jsFiles`);">Cancel</a><br>
+                                            Uploaded: <input type="text" name="jfs" id="jfs" style="width:75%" readonly><br>
                                             <input type="hidden" name="jf" id="jf">
                                             <input type="hidden" name="time" id="time">
                                         </td>
@@ -206,8 +205,7 @@ const serverData = <?php echo json_encode(buildServerData(
                     <input type="hidden" name="htmlf" id="htmlf">
                     <input type="hidden" name="htmlf1" id="htmlf1">
                     <input type="hidden" name="dosM" id="dosM">
-                    <input type="hidden" name="cf1" id="cf1">
-                    <input type="hidden" name="cf2" id="cf2">
+                    <input type="hidden" name="cfs" id="cfs">
                     <input type="hidden" name="cjd" id="cjd">
                     <input type="hidden" name="imgs" id="imgs">
                     <input type="hidden" name="imgf" id="imgf">

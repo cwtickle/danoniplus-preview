@@ -243,43 +243,55 @@ function processFileUploads($rootDir, $randTime) {
     }
 
     /*-----------------------------------
-     * カスタムJS（3つ）
+     * カスタムJS（複数）
      *-----------------------------------*/
-    for ($i = 1; $i <= 3; $i++) {
-        if (!empty($_FILES['jsFile'.$i]['tmp_name']) && $_FILES['jsFile'.$i]['error'] === UPLOAD_ERR_OK) {
-            $filename = basename($_FILES['jsFile'.$i]['name']);
-            $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    if (!empty($_FILES['jsFiles']['name'][0])) {
+        $jsList = [];
 
-            if ($ext === 'js') {
-                $savedName = $randTime . '_' . $filename;
-                $uploadPath = $rootDir . '/tmp/' . $savedName;
+        foreach ($_FILES['jsFiles']['name'] as $idx => $name) {
+            if ($_FILES['jsFiles']['error'][$idx] === UPLOAD_ERR_OK) {
+                $filename = basename($name);
+                $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 
-                if (move_uploaded_file($_FILES['jsFile'.$i]['tmp_name'], $uploadPath)) {
-                    $uploaded['js'][] = $savedName;
-                    $_POST['jf'.$i] = $filename;
+                if ($ext === 'js') {
+                    $savedName = $randTime . '_' . $filename;
+                    $uploadPath = $rootDir . '/tmp/' . $savedName;
+
+                    if (move_uploaded_file($_FILES['jsFiles']['tmp_name'][$idx], $uploadPath)) {
+                        $uploaded['js'][] = $savedName;
+                        $jsList[] = $filename; // 表示用
+                    }
                 }
             }
         }
+
+        $_POST['jfs'] = implode(',', $jsList);
     }
 
     /*-----------------------------------
-     * カスタムCSS（2つ）
+     * カスタムCSS（複数）
      *-----------------------------------*/
-    for ($i = 1; $i <= 2; $i++) {
-        if (!empty($_FILES['cssFile'.$i]['tmp_name']) && $_FILES['cssFile'.$i]['error'] === UPLOAD_ERR_OK) {
-            $filename = basename($_FILES['cssFile'.$i]['name']);
-            $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    if (!empty($_FILES['cssFiles']['name'][0])) {
+        $cssList = [];
 
-            if ($ext === 'css') {
-                $savedName = $randTime . '_' . $filename;
-                $uploadPath = $rootDir . '/tmp/' . $savedName;
+        foreach ($_FILES['cssFiles']['name'] as $idx => $name) {
+            if ($_FILES['cssFiles']['error'][$idx] === UPLOAD_ERR_OK) {
+                $filename = basename($name);
+                $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 
-                if (move_uploaded_file($_FILES['cssFile'.$i]['tmp_name'], $uploadPath)) {
-                    $uploaded['css'][] = $savedName;
-                    $_POST['cf'.$i] = $filename;
+                if ($ext === 'css') {
+                    $savedName = $randTime . '_' . $filename;
+                    $uploadPath = $rootDir . '/tmp/' . $savedName;
+
+                    if (move_uploaded_file($_FILES['cssFiles']['tmp_name'][$idx], $uploadPath)) {
+                        $uploaded['css'][] = $savedName;
+                        $cssList[] = $filename; // 表示用
+                    }
                 }
             }
         }
+
+        $_POST['cfs'] = implode(',', $cssList);
     }
 
     /*-----------------------------------
@@ -360,12 +372,9 @@ function buildServerData($uploaded, $uploadedPreJs, $randTime, $rootDir, $rootUr
             'k'        => $_POST['k']        ?? '',
             'mf'       => $_POST['mf']       ?? '',
             'jf'       => $_POST['jf']       ?? '',
-            'jf1'      => $_POST['jf1']      ?? '',
-            'jf2'      => $_POST['jf2']      ?? '',
-            'jf3'      => $_POST['jf3']      ?? '',
+            'jfs'      => $_POST['jfs']      ?? '',
             'cf'       => $_POST['cf']       ?? '',
-            'cf1'      => $_POST['cf1']      ?? '',
-            'cf2'      => $_POST['cf2']      ?? '',
+            'cfs'      => $_POST['cfs']      ?? '',
             'imgs'     => $_POST['imgs']     ?? '',
             'imgf'     => $_POST['imgf']     ?? '',
             'dosf'     => $_POST['dosf']     ?? '',
