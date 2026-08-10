@@ -22,24 +22,12 @@ const { dosData, difData_g: initialDifData_g, urlDomain, musicData_g } = applySe
 });
 let difData_g = initialDifData_g;
 
-// 楽曲名情報の設定 (musicUrlについては指定の有無によらず一旦"nosound.mp3"で上書きし、既存のデータは使わない)
-if (dosData.indexOf('|musicTitle=') !== -1) {
-    document.getElementById('dos').value += `|musicUrl=nosound.mp3|`;
-} else {
-    document.getElementById('dos').value += musicData_g;
-}
-
-if (difData_g !== '') {
-    const tmpDifData = [];
-    difData_g.split(`$`).forEach(difs => tmpDifData.push(difs.split(`,`).length > 2 ? difs : `${difs},Normal,3.5`));
-    document.getElementById('dos').value += `|difData=${tmpDifData.join('$')}|`;
-    document.getElementById('k').value = difData_g;
-}
-
-// 音源ファイルの設定 (ファイル名が動的に変わるためここで設定)
-if (document.getElementById('mf').value !== '') {
-    document.getElementById('dos').value += `|musicUrl=${document.getElementById('time').value + `_` + document.getElementById('mf').value}|`;
-}
+applyPreviewDosCommonData({
+    dosData,
+    difData_g,
+    musicData_g,
+    noSoundPath: `nosound.mp3`,
+});
 
 // カスタムJSファイルの設定
 if (document.getElementById('jf').value !== '') {
@@ -139,24 +127,7 @@ v.style.backgroundColor = v.options[v.selectedIndex].style.backgroundColor;
 enhanceVersionSelect('v');
 
 // 譜面エリアにフォーカスが当たっているときだけ、onkeydown, oncontextmenu の設定をリセット
-let bkEvent, bkEventCxt;
-const dfEvent = evt => { };
-const dfCxt = evt => true;
-
-[`d`, `k`, `vSearchInput`].forEach(txt => {
-    document.getElementById(txt).addEventListener('focus', () => {
-        if (document.onkeydown !== dfEvent) {
-            bkEvent = document.onkeydown;
-            bkEventCxt = document.oncontextmenu;
-        }
-        document.onkeydown = dfEvent;
-        document.oncontextmenu = dfCxt;
-    });
-    document.getElementById(txt).addEventListener('blur', () => {
-        document.onkeydown = bkEvent;
-        document.oncontextmenu = bkEventCxt;
-    });
-});
+setupPreviewFocusReset([`d`, `k`, `vSearchInput`]);
 
 const { storageOrg } = applyLocalStorageDefaults({
     urlDomain,
