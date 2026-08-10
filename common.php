@@ -98,8 +98,29 @@ function compareSemanticVersions($versionA, $versionB) {
  * @return array{0: string, 1: string} [$rootDir, $rootUrl]
  */
 function resolveRootPaths() {
-    $rootDir = $_SERVER['DOCUMENT_ROOT'];
-    $rootUrl = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . '://' . $_SERVER['HTTP_HOST'] . '/';
+    // 1. 物理ルートディレクトリの判定
+    // common.php が置かれているディレクトリ（あるいはこのプロジェクトのルート）を基準にする
+    // ※ common.php と同一階層がルートの場合は __DIR__ でOK
+    $rootDir = realpath(__DIR__); 
+
+    // Windows環境等のパス区切り文字（\）をスラッシュ（/）に統一
+    $docRoot = str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT']));
+    $normalizedRootDir = str_replace('\\', '/', $rootDir);
+
+    // 2. ドキュメントルートからの相対パス（サブディレクトリのパス）を算出
+    // 例: ドキュメントルートが /var/www/html、$rootDir が /var/www/html/danoni/ の場合 -> /danoni
+    $subDir = '';
+    if ($docRoot !== '' && strpos($normalizedRootDir, $docRoot) === 0) {
+        $subDir = substr($normalizedRootDir, strlen($docRoot));
+    }
+    $subDir = rtrim($subDir, '/') . '/';
+
+    // 3. ルートURLの生成
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
+
+    $rootUrl = $scheme . '://' . $host . $subDir;
+
     return [$rootDir, $rootUrl];
 }
 
