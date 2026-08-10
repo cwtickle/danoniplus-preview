@@ -4,12 +4,12 @@ RewriteEngine on
 Action myphp-script /php.cgi
 AddHandler myphp-script .php .html
 
-RewriteRule ^v(\d+)/_preview/danonicw-v(\d+\.\d+\.[\dx.-]+[\(A-Za-z0-9\)]*)/preview/ preview_classic.php [QSA,L]
-RewriteRule ^v\d+/_preview/danonicw-v[\d.x]+[-\(A-Za-z0-9\)\s]*/music/(.*)$ tmp/$1 [L]
+RewriteRule ^v(\d+)/_preview/danoni(?:cw|plus)-v(\d+\.\d+\.[\dx.-]+[\(A-Za-z0-9\)]*)/preview/ preview_classic.php [QSA,L]
+RewriteRule ^v\d+/_preview/danoni(?:cw|plus)-v[\d.x]+[-\(A-Za-z0-9\)\s]*/music/(.*)$ tmp/$1 [L]
 
-RewriteRule ^v\d+/_preview/danonicw-v[\d.x]+[-\(A-Za-z0-9\)\s]*/img/fish/(.*)$ tmp/img/fish/$1 [L]
-RewriteRule ^v\d+/_preview/danonicw-v[\d.x]+[-\(A-Za-z0-9\)\s]*/img/kirizma/(.*)$ tmp/img/kirizma/$1 [L]
-RewriteRule ^v\d+/_preview/danonicw-v[\d.x]+[-\(A-Za-z0-9\)\s]*/img/panels/(.*)$ tmp/img/panels/$1 [L]
+RewriteRule ^v\d+/_preview/danoni(?:cw|plus)-v[\d.x]+[-\(A-Za-z0-9\)\s]*/img/fish/(.*)$ tmp/img/fish/$1 [L]
+RewriteRule ^v\d+/_preview/danoni(?:cw|plus)-v[\d.x]+[-\(A-Za-z0-9\)\s]*/img/kirizma/(.*)$ tmp/img/kirizma/$1 [L]
+RewriteRule ^v\d+/_preview/danoni(?:cw|plus)-v[\d.x]+[-\(A-Za-z0-9\)\s]*/img/panels/(.*)$ tmp/img/panels/$1 [L]
 
 RewriteRule ^img/fish/(.*)$ tmp/img/fish/$1 [L]
 RewriteRule ^img/kirizma/(.*)$ tmp/img/kirizma/$1 [L]

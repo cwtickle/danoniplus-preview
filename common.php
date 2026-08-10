@@ -43,11 +43,10 @@ function escapeStrMusic($str) {
  */
 function extractVersionFromFilename($filename) {
     // /\/danonicw-v([\d.x]+)\//
-    if (preg_match('/\/danonicw-v([\dx.-]+[\(A-Za-z0-9\)\s]*)\//', $filename, $matches)) {
+    if (preg_match('/\/danoni(?:cw|plus)-v([\dx.-]+[\(A-Za-z0-9\)\s]*)\//', $filename, $matches)) {
         return $matches[1];
-    } else {
-        return null;
     }
+    return null;
 }
 
 /**
@@ -56,7 +55,7 @@ function extractVersionFromFilename($filename) {
  */
 function findFilesMatchingPattern() {
     $files = [];
-    $dirContents = glob('./v*/_preview/danonicw-*/js/danoni_main.js');
+    $dirContents = glob('./v*/_preview/danoni{cw,plus}-*/js/danoni_main.js', GLOB_BRACE) ?: [];
 
     foreach ($dirContents as $item) {
         $files[] = $item;
