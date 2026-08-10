@@ -75,12 +75,6 @@ if ($previewConfig['type'] === 'cdn') {
     <title>Dancing☆Onigiri Preview<?php echo $previewConfig['titleSuffix']; ?></title>
 
     <link rel="stylesheet" href="./danoni_preview_common.css?<?php echo $updateTimestamp; ?>">
-    <style type="text/css">
-    th,
-    td {
-        padding: 2px;
-    }
-    </style>
 <?php
 
 // ▼ ランダムタイムスタンプ

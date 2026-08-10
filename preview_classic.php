@@ -1,7 +1,7 @@
 ﻿<?php
 require_once __DIR__ . '/common.php';
 
-$updateTimestamp = '2026-08-19_060000';
+$updateTimestamp = '2026-08-19_070000';
 
 [$rootDir, $rootUrl] = resolveRootPaths();
 
@@ -211,6 +211,9 @@ const serverData = <?php echo json_encode(buildServerData(
                 </p>
                 <script src="<?php echo $rootUrl; ?>danoni_preview_main.js?<?php echo $updateTimestamp; ?>"></script>
                 <script src="<?php echo $rootUrl; ?>danoni_preview_classic.js?<?php echo $updateTimestamp; ?>"></script>
+                <script type="text/javascript">
+                    initDanoniPreviewClassic();
+                </script>
                 <hr>
                 <p style="text-align:center;">
                     <a id="removeKey" onclick="removeKeySave()">Remove local storage by keymode / キー別のローカルストレージを削除</a><br>
