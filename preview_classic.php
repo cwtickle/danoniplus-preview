@@ -144,14 +144,14 @@ const serverData = <?php echo json_encode(buildServerData(
                                 <div class="settings-card-title settings-card-title-2">File Upload / ファイルアップロード</div>
                                 <table class="settings-table">
                                     <tr>
-                                        <td>Music File<br>楽曲ファイル</td>
+                                        <td>Music File<br>楽曲ファイル<br><a class="pill-link" onclick="confirmCancelFile(`musicFile`, `mf`);">Reset</a></td>
                                         <td>
                                             <input type="file" id="musicFile" name="musicFile" accept=".mp3,.mp4,.m4a,.ogg,.oga,.aac,.flac,.js"> <a onclick="cancelFile(`musicFile`);">Cancel</a><br>
                                             Uploaded: <input type="text" name="mf" id="mf" style="width:75%" readonly>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Custom JS Files<br><a class="pill-link" onclick="confirmCancelFile(`jfs`, `jf`);">Reset</a></td>
+                                        <td>Custom JS Files<br><a class="pill-link" onclick="confirmCancelFile(`jsFiles`, `jfs`, `jf`);">Reset</a></td>
                                         <td>
                                             <input type="file" id="jsFiles" name="jsFiles[]" accept=".js" title="" multiple> <a onclick="cancelFile(`jsFiles`);">Cancel</a><br>
                                             Uploaded: <input type="text" name="jfs" id="jfs" style="width:75%" readonly><br>

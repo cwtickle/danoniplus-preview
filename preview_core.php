@@ -280,6 +280,7 @@ const serverData = <?php echo json_encode(buildServerData(
                                                     64MBまでのファイルがアップロード可能です。
                                                 </span>
                                             </span>
+                                            <br><a class="pill-link" onclick="confirmCancelFile(`musicFile`, `mf`);">Reset</a>
                                         </td>
                                         <td>
                                             <input type="file" id="musicFile" name="musicFile" accept=".mp3,.mp4,.m4a,.ogg,.oga,.aac,.flac,.js"> <a onclick="cancelFile(`musicFile`);">Cancel</a><br>
@@ -287,7 +288,7 @@ const serverData = <?php echo json_encode(buildServerData(
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Chart File<br>譜面ファイル<br><a class="pill-link" onclick="confirmCancelFile(`dosf1`);">Reset</a></td>
+                                        <td>Chart File<br>譜面ファイル<br><a class="pill-link" onclick="confirmCancelFile(`dosFile1`, `dosf1`, `dosf`);">Reset</a></td>
                                         <td>
                                             <input type="file" id="dosFile1" name="dosFile1" accept=".js,.txt"> <a onclick="cancelFile(`dosFile1`);">Cancel</a><br>
                                             Charset : <select class="select" name="dosM" id="dosM">
@@ -299,10 +300,10 @@ const serverData = <?php echo json_encode(buildServerData(
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>HTML Template<br><a class="pill-link" onclick="confirmCancelFile(`htmlf1`, `htmlf`);">Reset</a> <a class="pill-link" href="<?php echo $previewConfig['templateFile']; ?>" download>DL Template</a></td>
+                                        <td>HTML Template<br><a class="pill-link" onclick="confirmCancelFile(`htmlFile`, `htmlf1`, `htmlf`);">Reset</a> <a class="pill-link" href="<?php echo $previewConfig['templateFile']; ?>" download>DL Template</a></td>
                                         <td>
                                             <input type="file" id="htmlFile" name="htmlFile" accept=".html,.htm"> <a onclick="cancelFile(`htmlFile`);">Cancel</a><br>
-                                            Uploaded: <input type="text" name="htmlf1" id="htmlf1" readonly><br>
+                                            Uploaded: <input type="text" name="htmlf1" id="htmlf1" style="width:75%" readonly><br>
                                             <input type="hidden" name="htmlf" id="htmlf">
                                         </td>
                                     </tr>
@@ -315,7 +316,7 @@ const serverData = <?php echo json_encode(buildServerData(
                                                     背景やマスク等で指定する画像ファイル一式をアップロードします。
                                                 </span>
                                             </span>
-                                            <br><a class="pill-link" onclick="confirmCancelFile(`imgs`, `imgf`);">Reset</a></td>
+                                            <br><a class="pill-link" onclick="confirmCancelFile(`imgFiles`, `imgs`, `imgf`);">Reset</a></td>
                                         <td>
                                             <input type="file" id="imgFiles" name="imgFiles[]" accept=".png,.jpg,.jpeg,.gif,.svg,.webp" multiple> <a onclick="cancelFile(`imgFiles`);">Cancel</a><br>
                                             Uploaded: <input type="text" name="imgs" id="imgs" style="width:75%" readonly><br>
@@ -418,7 +419,7 @@ const serverData = <?php echo json_encode(buildServerData(
                                                 カスタムJSや共通設定ファイル、スキン用JSファイルをアップロードできます。
                                             </span>
                                         </span>
-                                        <br><a class="pill-link" onclick="confirmCancelFile(`jfs`, `jf`);">Reset</a></td>
+                                        <br><a class="pill-link" onclick="confirmCancelFile(`jsFiles`, `jfs`, `jf`);">Reset</a></td>
                                     <td>
                                         <input type="file" id="jsFiles" name="jsFiles[]" accept=".js" title="" multiple> <a onclick="cancelFile(`jsFiles`);">Cancel</a><br>
                                         Uploaded: <input type="text" name="jfs" id="jfs" style="width:75%" readonly><br>
@@ -435,7 +436,7 @@ const serverData = <?php echo json_encode(buildServerData(
                                                 カスタムCSSやスキン用CSSファイルをアップロードできます。
                                             </span>
                                         </span>
-                                        <br><a class="pill-link" onclick="confirmCancelFile(`cfs`, `cf`);">Reset</a></td>
+                                        <br><a class="pill-link" onclick="confirmCancelFile(`cssFiles`, `cfs`, `cf`);">Reset</a></td>
                                     <td>
                                         <input type="file" id="cssFiles" name="cssFiles[]" accept=".css" title="" multiple> <a onclick="cancelFile(`cssFiles`);">Cancel</a><br>
                                         Uploaded: <input type="text" name="cfs" id="cfs" style="width:75%" readonly><br>
@@ -476,7 +477,7 @@ const serverData = <?php echo json_encode(buildServerData(
                                                 danoni_main.jsより前にロードするjsファイルをまとめてアップロードします。
                                             </span>
                                         </span>
-                                        <br><a class="pill-link" onclick="confirmCancelFile(`prejs`, `prejf`);">Reset</a></td>
+                                        <br><a class="pill-link" onclick="confirmCancelFile(`prejsFiles`, `prejs`, `prejf`);">Reset</a></td>
                                     <td>
                                         <input type="file" id="prejsFiles" name="prejsFiles[]" accept=".js" title="" multiple> <a onclick="cancelFile(`prejsFiles`);">Cancel</a><br>
                                         Uploaded: <input type="text" name="prejs" id="prejs" style="width:75%" readonly><br>
