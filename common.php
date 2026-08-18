@@ -215,7 +215,7 @@ function processFileUploads($rootDir, $randTime) {
         $filename = escapeStrMusic(basename($_FILES['musicFile']['name']));
         $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 
-        if (in_array($ext, ['mp3','mp4','m4a','ogg','oga','aac','flac','js'])) {
+        if (in_array($ext, ['mp3','mp4','m4a','ogg','oga','aac','flac','wav','js'])) {
             $savedName = $randTime . '_' . $filename;
             $uploadPath = $rootDir . '/tmp/' . $savedName;
 

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * index.php (ローカル版) と jsdelivr.php / unpkg.php (CDN版) で共有するメイン処理。
  *
  * 呼び出し側は先に serverData (各PHPが出力する <script> ブロック) を
@@ -1085,7 +1085,7 @@ const enhanceVersionSelect = (_selectId) => {
         return;
     }
 
-    const acceptExts = ['mp3', 'mp4', 'm4a', 'ogg', 'oga', 'aac', 'flac', 'js'];
+    const acceptExts = ['mp3', 'mp4', 'm4a', 'ogg', 'oga', 'aac', 'flac', 'wav', 'js'];
 
     const isFileDrag = evt => !!evt.dataTransfer?.types?.includes('Files');
 
