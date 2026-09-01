@@ -16,7 +16,7 @@ require_once __DIR__ . '/common.php';
 //     'sourceKey'            => 'local' | 'jsdelivr' | 'unpkg' など、参照元を切り替えるためのキー
 // ]
 
-$updateTimestamp = '2026-09-01_200000';
+$updateTimestamp = '2026-09-01_210000';
 $getParamPath = '';
 if ($previewConfig['type'] === 'cdn') {
 	if (isset($_GET["v"])) {

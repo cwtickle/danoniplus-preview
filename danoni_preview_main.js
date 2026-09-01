@@ -547,10 +547,16 @@ const initDanoniPreview = (config) => {
             },
             '9tkey': (_type) => `(..)tmp/scriptLib/9tkey.${_type}`,
         },
-        '39.0.0': {
+        '40.6.0': {
             kstyle: (_type) => `https://cdn.jsdelivr.net/gh/cwtickle/kirizma-cw@v2/${_type}/kstyle.${_type}`,
             pstyle: (_type) => `https://cdn.jsdelivr.net/gh/cwtickle/punching-panels@v1/${_type}/pstyle.${_type}`,
             pstyle_dp: (_type) => `https://cdn.jsdelivr.net/gh/cwtickle/punching-panels@v1/${_type}/${_type === 'css' ? 'pstyle_36p.css' : 'pstyle.js'}`,
+            '9tkey': (_type) => `(..)tmp/scriptLib/v44/9tkey.${_type}`,
+        },
+        '39.0.0': {
+            kstyle: (_type) => `(..)tmp/scriptLib/v44/kstyle.${_type}`,
+            pstyle: (_type) => `(..)tmp/scriptLib/v44/pstyle.${_type}`,
+            pstyle_dp: (_type) => `(..)tmp/scriptLib/v44/${_type === 'css' ? 'pstyle_36p.css' : 'pstyle.js'}`,
             '9tkey': (_type) => `(..)tmp/scriptLib/v44/9tkey.${_type}`,
         },
         '32.0.0': {
