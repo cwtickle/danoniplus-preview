@@ -528,109 +528,112 @@ const initDanoniPreview = (config) => {
         musicUrlPrefix: `(..)/tmp/`,
     });
 
-    // v45.0.0以降、CDNから参照するゲームモード別の追加ライブラリ設定
-    // (kstyle, pstyle, pstyle_dp 以外は従来通りローカルの scriptLib を参照する)
-    const cdnLibConfig = {
-        kstyle: { repo: `cwtickle/kirizma-cw@v3`, file: `kstyle` },
-        pstyle: { repo: `cwtickle/punching-panels@v2`, file: `pstyle` },
-        pstyle_dp: { repo: `cwtickle/punching-panels@v2`, file: `pstyle` },
-    };
-    const resolveCdnLibUrl = (_type) => {
-        const cfg = cdnLibConfig[gameMode.value];
-        return cfg ? `https://cdn.jsdelivr.net/gh/${cfg.repo}/${_type}/${cfg.file}.${_type}` : null;
-    };
-
-    // カスタムJSファイルの設定
-    const arrayCustomJs = [];
-    const applyCustomJs = (_val, _subDirectory = ``) => {
-        if (_val === `pstyle_dp`) {
-            arrayCustomJs.push(`(..)tmp/scriptLib/${_subDirectory}pstyle.js`);
-            document.getElementById(`srcjs`).href = `./tmp/scriptLib/${_subDirectory}pstyle.js`;
-        } else {
-            arrayCustomJs.push(`(..)tmp/scriptLib/${_subDirectory}${_val}.js`);
-            document.getElementById(`srcjs`).href = `./tmp/scriptLib/${_subDirectory}${_val}.js`;
+    // ゲームモード別のカスタムJS/CSS設定
+    // 1. バージョンとゲームモードを軸にした設定定義（新しい順に並べる）
+    const assetConfig = {
+        '50.2.0': {
+            kstyle: (_type) => `https://cdn.jsdelivr.net/gh/cwtickle/kirizma-cw@v4/${_type}/kstyle.${_type}`,
+            pstyle: (_type) => `https://cdn.jsdelivr.net/gh/cwtickle/punching-panels@v3/${_type}/pstyle.${_type}`,
+            get pstyle_dp() {
+                return this.pstyle;
+            },
+            '9tkey': (_type) => `(..)tmp/scriptLib/9tkey.${_type}`,
+        },
+        '45.0.0': {
+            kstyle: (_type) => `https://cdn.jsdelivr.net/gh/cwtickle/kirizma-cw@v3/${_type}/kstyle.${_type}`,
+            pstyle: (_type) => `https://cdn.jsdelivr.net/gh/cwtickle/punching-panels@v2/${_type}/pstyle.${_type}`,
+            get pstyle_dp() {
+                return this.pstyle;
+            },
+            '9tkey': (_type) => `(..)tmp/scriptLib/9tkey.${_type}`,
+        },
+        '39.0.0': {
+            kstyle: (_type) => `https://cdn.jsdelivr.net/gh/cwtickle/kirizma-cw@v2/${_type}/kstyle.${_type}`,
+            pstyle: (_type) => `https://cdn.jsdelivr.net/gh/cwtickle/punching-panels@v1/${_type}/pstyle.${_type}`,
+            pstyle_dp: (_type) => `https://cdn.jsdelivr.net/gh/cwtickle/punching-panels@v1/${_type}/${_type === 'css' ? 'pstyle_36p.css' : 'pstyle.js'}`,
+            '9tkey': (_type) => `(..)tmp/scriptLib/v44/9tkey.${_type}`,
+        },
+        '32.0.0': {
+            kstyle: (_type) => `(..)tmp/scriptLib/v38/kstyle.${_type}`,
+            pstyle: (_type) => `(..)tmp/scriptLib/v38/pstyle.${_type}`,
+            pstyle_dp: (_type) => `(..)tmp/scriptLib/v38/${_type === 'css' ? 'pstyle_36p.css' : 'pstyle.js'}`,
+            '9tkey': (_type) => `(..)tmp/scriptLib/v38/9tkey.${_type}`,
         }
     };
 
-    if (gameMode.value !== '') {
-        if (compareVersions(baseVersion, '45.0.0') >= 0) {
-            const cdnUrl = resolveCdnLibUrl(`js`);
-            if (cdnUrl) {
-                arrayCustomJs.push(cdnUrl);
-                document.getElementById(`srcjs`).href = cdnUrl;
-            } else {
-                applyCustomJs(gameMode.value);
+    // 2. 適用処理を行うヘルパー関数
+    const applyAsset = (_type, arrayTarget, elementId) => {
+        if (gameMode.value === '') {
+            if (_type === 'css') {
+                document.getElementById(elementId).style.display = 'none';
             }
-        } else if (compareVersions(baseVersion, '39.0.0') >= 0) {
-            applyCustomJs(gameMode.value, `v44/`);
-        } else {
-            arrayCustomJs.push(`(..)tmp/scriptLib/v38/${gameMode.value}.js`);
-            document.getElementById(`srcjs`).href = `./tmp/scriptLib/v38/${gameMode.value}.js`;
+            return;
         }
-    } else if (compareVersions(baseVersion, '32.0.0') >= 0) {
-        arrayCustomJs.push(`(..)tmp/scriptLib/danoni.js`);
-        document.getElementById(`srcjs`).href = `./tmp/scriptLib/danoni.js`;
-    } else {
-        document.getElementById(`ck`).style.visibility = `hidden`;
-        document.getElementById(`modeLbl`).style.visibility = `hidden`;
-        document.getElementById(`modett`).style.visibility = `hidden`;
+
+        // 基準バージョンを満たす最初の設定ブロックを検索
+        const targetVersion = Object.keys(assetConfig).find(ver => compareVersions(baseVersion, ver) >= 0);
+        if (!targetVersion) return;
+
+        const modeConfig = assetConfig[targetVersion][gameMode.value];
+        if (!modeConfig) return;
+
+        // 関数または文字列からパスを解決
+        const assetPath = typeof modeConfig === 'function' ? modeConfig(_type) : modeConfig;
+        if (!assetPath) return;
+
+        arrayTarget.push(assetPath);
+
+        // (..) を ./ に置換してDOMに反映（CDN等の場合はそのまま）
+        const domPath = assetPath.replace('(..)', '.');
+        document.getElementById(elementId).href = domPath;
+    };
+
+    // 3. 実行
+    const arrayCustomJs = [];
+    const arrayCustomCss = [];
+    applyAsset('js', arrayCustomJs, 'srcjs');
+    applyAsset('css', arrayCustomCss, 'srccss');
+
+    // ダンおにの場合のデフォルトカスタムJS設定
+    if (gameMode.value === '') {
+        if (compareVersions(baseVersion, '32.0.0') >= 0) {
+            arrayCustomJs.push(`(..)tmp/scriptLib/danoni.js`);
+            document.getElementById(`srcjs`).href = `./tmp/scriptLib/danoni.js`;
+        } else {
+            document.getElementById(`ck`).style.visibility = `hidden`;
+            document.getElementById(`modeLbl`).style.visibility = `hidden`;
+            document.getElementById(`modett`).style.visibility = `hidden`;
+        }
     }
+    // 実験的なカスタムJSファイル
     if (document.getElementById('cjd').value !== '') {
         arrayCustomJs.push(`(..)${document.getElementById('cjd').value}`);
     }
+    // ユーザ指定のカスタムJSファイル
     if (document.getElementById('jf').value !== '') {
         arrayCustomJs.push(`${document.getElementById('jf').value.replaceAll(`../music/`, `(..)/tmp/`)}`);
     }
     if (arrayCustomJs.length > 0) {
         document.getElementById('dos').value += `|customjs=${arrayCustomJs.join(',')}|`;
     }
-
-    if (compareVersions(baseVersion, '40.4.0') < 0) {
-        document.getElementById(`source`).style.visibility = `hidden`;
-        document.getElementById(`sourceLbl`).style.visibility = `hidden`;
-        document.getElementById(`sourcett`).style.visibility = `hidden`;
-    }
-
-    // カスタムCSSファイルの設定
-    const arrayCustomCss = [];
-    const applyCustomCss = (_val, _subDirectory = ``) => {
-        if (_val === `pstyle_dp`) {
-            arrayCustomCss.push(`(..)tmp/scriptLib/${_subDirectory}pstyle_36p.css`);
-            document.getElementById(`srccss`).href = `./tmp/scriptLib/${_subDirectory}pstyle_36p.css`;
-        } else {
-            arrayCustomCss.push(`(..)tmp/scriptLib/${_subDirectory}${_val}.css`);
-            document.getElementById(`srccss`).href = `./tmp/scriptLib/${_subDirectory}${_val}.css`;
-        }
-    };
-    if (gameMode.value !== '') {
-        if (compareVersions(baseVersion, '45.0.0') >= 0) {
-            const cdnUrl = resolveCdnLibUrl(`css`);
-            if (cdnUrl) {
-                arrayCustomCss.push(cdnUrl);
-                document.getElementById(`srccss`).href = cdnUrl;
-            } else {
-                applyCustomCss(gameMode.value);
-            }
-        } else if (compareVersions(baseVersion, '39.0.0') >= 0) {
-            applyCustomCss(gameMode.value, `v44/`);
-        } else {
-            arrayCustomCss.push(`(..)tmp/scriptLib/v38/${gameMode.value}.css`);
-            document.getElementById(`srccss`).href = `./tmp/scriptLib/v38/${gameMode.value}.css`;
-        }
-    } else {
-        document.getElementById(`srccss`).style.display = `none`;
-    }
+    // ユーザ指定のカスタムCSSファイル
     if (document.getElementById('cf').value !== '') {
         arrayCustomCss.push(`${document.getElementById('cf').value}`);
     }
     if (arrayCustomCss.length > 0) {
         document.getElementById('dos').value += `|customcss=${arrayCustomCss.join(',')}|`;
     }
-
+    // 画像ファイル
     const imgs = document.getElementById(`imgs`).value?.split(`,`);
     const imgf = document.getElementById(`imgf`).value?.split(`,`);
     imgs.filter(img => img !== ``).forEach((img, j) =>
         document.getElementById('dos').value = document.getElementById('dos').value.replaceAll(img, `./tmp/${imgf[j]}`));
+
+    if (compareVersions(baseVersion, '40.4.0') < 0) {
+        document.getElementById(`source`).style.visibility = `hidden`;
+        document.getElementById(`sourceLbl`).style.visibility = `hidden`;
+        document.getElementById(`sourcett`).style.visibility = `hidden`;
+    }
 
     // ダウンロードボタンの処理
     const loadButton = document.getElementById('loadButton');
