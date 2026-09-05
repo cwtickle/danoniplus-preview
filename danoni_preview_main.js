@@ -590,7 +590,7 @@ const initDanoniPreview = (config) => {
         arrayTarget.push(assetPath);
 
         // (..) を ./ に置換してDOMに反映（CDN等の場合はそのまま）
-        const domPath = assetPath.replace('(..)', '.');
+        const domPath = assetPath.replace('(..)', '');
         document.getElementById(elementId).href = domPath;
     };
 
